@@ -1,0 +1,208 @@
+# Label configuration for 100xBot Community Hub
+# This file defines all the labels used in the issue tracker
+# Use with github-label-sync or similar tools
+
+# Type labels - what kind of issue is this?
+- name: bug
+  color: d73a4a
+  description: Something isn't working correctly
+
+- name: enhancement
+  color: a2eeef
+  description: New feature or request
+
+- name: documentation
+  color: 0075ca
+  description: Improvements or additions to documentation
+
+- name: question
+  color: d876e3
+  description: Further information is requested
+
+- name: model-support
+  color: 7057ff
+  description: Request for new LLM model support
+
+- name: integration
+  color: 008672
+  description: Third-party integration request
+
+# Status labels - what state is this issue in?
+- name: triage
+  color: fbca04
+  description: Needs review by maintainers
+
+- name: in-progress
+  color: 0e8a16
+  description: Currently being worked on
+
+- name: blocked
+  color: b60205
+  description: Blocked by another issue or external dependency
+
+- name: needs-info
+  color: d93f0b
+  description: Needs more information from reporter
+
+- name: duplicate
+  color: cfd3d7
+  description: This issue already exists
+
+- name: wontfix
+  color: ffffff
+  description: This will not be worked on
+
+- name: invalid
+  color: e4e669
+  description: This doesn't seem right
+
+# Priority labels - how urgent is this?
+- name: "priority: critical"
+  color: b60205
+  description: Critical priority - immediate attention required
+
+- name: "priority: high"
+  color: d93f0b
+  description: High priority
+
+- name: "priority: medium"
+  color: fbca04
+  description: Medium priority
+
+- name: "priority: low"
+  color: 0e8a16
+  description: Low priority
+
+# Difficulty labels - for contributors
+- name: good-first-issue
+  color: 7057ff
+  description: Good for newcomers
+
+- name: help-wanted
+  color: 008672
+  description: Extra attention is needed from the community
+
+- name: easy
+  color: c5def5
+  description: Easy to fix
+
+- name: medium-difficulty
+  color: bfd4f2
+  description: Moderate difficulty
+
+- name: hard
+  color: 91bbeb
+  description: Difficult to fix
+
+# Component labels - what part of the system?
+- name: "component: ui"
+  color: 5319e7
+  description: User interface issues
+
+- name: "component: agent"
+  color: 5319e7
+  description: Agent behavior and capabilities
+
+- name: "component: llm"
+  color: 5319e7
+  description: LLM integration issues
+
+- name: "component: automation"
+  color: 5319e7
+  description: Browser automation issues
+
+- name: "component: extraction"
+  color: 5319e7
+  description: Data extraction issues
+
+- name: "component: performance"
+  color: 5319e7
+  description: Performance issues
+
+- name: "component: security"
+  color: b60205
+  description: Security-related issues
+
+# Browser labels
+- name: "browser: chrome"
+  color: fef2c0
+  description: Chrome-specific issue
+
+- name: "browser: firefox"
+  color: fef2c0
+  description: Firefox-specific issue
+
+- name: "browser: edge"
+  color: fef2c0
+  description: Edge-specific issue
+
+- name: "browser: brave"
+  color: fef2c0
+  description: Brave-specific issue
+
+# OS labels
+- name: "os: windows"
+  color: c5f0c0
+  description: Windows-specific issue
+
+- name: "os: macos"
+  color: c5f0c0
+  description: macOS-specific issue
+
+- name: "os: linux"
+  color: c5f0c0
+  description: Linux-specific issue
+
+# LLM Provider labels
+- name: "llm: openai"
+  color: e99695
+  description: OpenAI-specific issue
+
+- name: "llm: anthropic"
+  color: e99695
+  description: Anthropic Claude-specific issue
+
+- name: "llm: google"
+  color: e99695
+  description: Google Gemini-specific issue
+
+- name: "llm: groq"
+  color: e99695
+  description: Groq-specific issue
+
+- name: "llm: custom"
+  color: e99695
+  description: Custom/self-hosted LLM issue
+
+# Special labels
+- name: support
+  color: d876e3
+  description: User support and troubleshooting
+
+- name: discussion
+  color: cc317c
+  description: Discussion or brainstorming
+
+- name: upstream
+  color: ededed
+  description: Issue in upstream dependency
+
+- name: breaking-change
+  color: d73a4a
+  description: Introduces breaking changes
+
+- name: regression
+  color: d73a4a
+  description: Previously working functionality is broken
+
+- name: needs-review
+  color: fbca04
+  description: Needs code review
+
+- name: needs-testing
+  color: fbca04
+  description: Needs testing before merge
+
+- name: community-feedback
+  color: 0075ca
+  description: Seeking community input

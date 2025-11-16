@@ -1,0 +1,20 @@
+# CODEOWNERS for 100xBot Community Hub
+#
+# This file defines who will be automatically requested for review
+# when someone opens a pull request or issue in this repository.
+#
+# Learn more about CODEOWNERS:
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything in the repo
+# These owners will be requested for review when someone opens a PR
+* @100x-bot/maintainers
+
+# Issue templates - notify community team
+/.github/ISSUE_TEMPLATE/ @100x-bot/community
+
+# Documentation files
+*.md @100x-bot/docs
+
+# GitHub workflows and automation
+/.github/workflows/ @100x-bot/maintainers

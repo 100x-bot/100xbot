@@ -1,0 +1,171 @@
+name: Integration Request
+description: Request integration with a third-party tool or service
+title: "[Integration]: "
+labels: ["integration", "enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Request integration with a third-party tool, service, or platform.
+
+  - type: input
+    id: service-name
+    attributes:
+      label: Service/Tool Name
+      description: What service or tool should 100xBot integrate with?
+      placeholder: e.g., Notion, Slack, Airtable, GitHub
+    validations:
+      required: true
+
+  - type: input
+    id: service-url
+    attributes:
+      label: Service URL
+      description: Link to the service's website
+      placeholder: https://...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: integration-type
+    attributes:
+      label: Integration Type
+      description: What type of integration are you requesting?
+      options:
+        - Data Export (send data to service)
+        - Data Import (fetch data from service)
+        - Bidirectional Sync
+        - Automation/Webhooks
+        - Authentication Provider
+        - API Integration
+        - Browser Extension Integration
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: How would you use this integration? What problem does it solve?
+      placeholder: |
+        I want to use 100xBot to automatically...
+        This would help me...
+    validations:
+      required: true
+
+  - type: textarea
+    id: workflow
+    attributes:
+      label: Desired Workflow
+      description: Describe the ideal workflow with this integration
+      placeholder: |
+        1. Agent extracts data from website
+        2. Data is formatted and sent to [service]
+        3. [Service] stores/processes the data
+        4. User receives notification
+    validations:
+      required: true
+
+  - type: textarea
+    id: api-info
+    attributes:
+      label: API/Integration Information
+      description: Provide links to API documentation or integration guides
+      placeholder: |
+        - API docs: https://...
+        - Developer portal: https://...
+        - Authentication method: OAuth 2.0, API Key, etc.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: api-availability
+    attributes:
+      label: API Availability
+      description: Does this service have a public API?
+      options:
+        - "Yes - Free"
+        - "Yes - Paid/Premium tier only"
+        - "Yes - Beta/Limited access"
+        - "No public API"
+        - "Unknown"
+    validations:
+      required: true
+
+  - type: textarea
+    id: existing-tools
+    attributes:
+      label: Existing Tools/Libraries
+      description: Are there existing libraries or tools that could help with this integration?
+      placeholder: |
+        - Official SDK: https://...
+        - Third-party library: https://...
+        - Similar integrations: ...
+    validations:
+      required: false
+
+  - type: textarea
+    id: data-format
+    attributes:
+      label: Data Format
+      description: What data formats does the service support?
+      placeholder: JSON, CSV, Markdown, HTML, etc.
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Solutions
+      description: Have you tried any workarounds or alternative solutions?
+      placeholder: Currently I'm using... but it would be better if...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this integration to you?
+      options:
+        - Critical (blocking my workflow)
+        - High (would significantly improve my workflow)
+        - Medium (nice to have)
+        - Low (minor improvement)
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: requirements
+    attributes:
+      label: Requirements
+      description: Check all that apply
+      options:
+        - label: This service has a documented public API
+        - label: I have access to test this integration
+        - label: I can provide API credentials for testing (if needed)
+        - label: The service allows automation/API usage in their ToS
+
+  - type: checkboxes
+    id: willing-to-help
+    attributes:
+      label: Contribution
+      description: Would you be willing to help with this integration?
+      options:
+        - label: I would be willing to test the integration
+        - label: I would be willing to help implement this integration
+        - label: I would be willing to help with documentation
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched for similar integration requests
+          required: true
+        - label: I have provided links to relevant documentation
+          required: true
+        - label: This integration is technically feasible
+          required: true

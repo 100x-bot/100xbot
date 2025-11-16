@@ -1,0 +1,121 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for 100xBot
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature! Please provide as much detail as possible to help us understand your request.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: Is your feature request related to a problem? Please describe what you're trying to accomplish.
+      placeholder: "I'm frustrated when... / I need to be able to..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like to see implemented
+      placeholder: "I would like 100xBot to..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Describe any alternative solutions or features you've considered
+      placeholder: "I also thought about... / Other tools do this by..."
+    validations:
+      required: false
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feature Category
+      description: What category does this feature fall into?
+      options:
+        - Agent Capabilities (new agent actions/skills)
+        - User Interface (UI/UX improvements)
+        - LLM Integration (model support, prompting)
+        - Browser Automation (web interaction)
+        - Data Extraction (scraping, parsing)
+        - Workflow Management (task orchestration)
+        - Performance (speed, efficiency)
+        - Security/Privacy
+        - Developer Experience
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority Level
+      description: How important is this feature to your workflow?
+      options:
+        - Critical (blocking my work)
+        - High (would significantly improve my workflow)
+        - Medium (nice to have)
+        - Low (minor improvement)
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-cases
+    attributes:
+      label: Use Cases
+      description: Provide specific examples of how you would use this feature
+      placeholder: |
+        1. When I'm doing [task], I would use this to...
+        2. This would help me with...
+    validations:
+      required: true
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: Mockups or Examples
+      description: If applicable, add mockups, screenshots, or links to examples from other tools
+      placeholder: Drag and drop images or provide links
+    validations:
+      required: false
+
+  - type: textarea
+    id: technical-details
+    attributes:
+      label: Technical Details
+      description: If you have technical implementation ideas or requirements, share them here
+      placeholder: "This might require... / Could be implemented using..."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: willing-to-help
+    attributes:
+      label: Contribution
+      description: Would you be willing to help implement this feature?
+      options:
+        - label: I would be willing to submit a PR for this feature
+        - label: I would be willing to help test this feature
+        - label: I would be willing to help with documentation
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm the following before submitting
+      options:
+        - label: I have searched for similar feature requests
+          required: true
+        - label: This feature aligns with 100xBot's goals
+          required: true
+        - label: I have provided clear use cases and examples
+          required: true

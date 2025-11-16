@@ -1,0 +1,165 @@
+name: LLM Model Support Request
+description: Request support for a new LLM model or provider
+title: "[Model]: "
+labels: ["model-support", "enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Request support for a new LLM model or AI provider in 100xBot.
+
+  - type: input
+    id: model-name
+    attributes:
+      label: Model Name
+      description: What is the name of the model?
+      placeholder: e.g., GPT-4 Turbo, Claude 3.5 Sonnet, Llama 3
+    validations:
+      required: true
+
+  - type: input
+    id: provider
+    attributes:
+      label: Provider
+      description: Who provides this model?
+      placeholder: e.g., OpenAI, Anthropic, Meta, Mistral AI, Hugging Face
+    validations:
+      required: true
+
+  - type: dropdown
+    id: model-type
+    attributes:
+      label: Model Type
+      description: What type of model is this?
+      options:
+        - Text Generation (Chat/Completion)
+        - Vision (Image Understanding)
+        - Multimodal (Text + Vision)
+        - Code Generation
+        - Embedding
+        - Function Calling
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: access-type
+    attributes:
+      label: Access Type
+      description: How is this model accessed?
+      options:
+        - API (Cloud-hosted)
+        - Self-hosted (Local)
+        - Open Source
+        - Beta/Limited Access
+        - Enterprise Only
+    validations:
+      required: true
+
+  - type: textarea
+    id: api-docs
+    attributes:
+      label: API Documentation
+      description: Provide links to the model's API documentation
+      placeholder: |
+        - Official API docs: https://...
+        - Model card: https://...
+        - GitHub repo: https://...
+    validations:
+      required: true
+
+  - type: textarea
+    id: capabilities
+    attributes:
+      label: Key Capabilities
+      description: What are the key capabilities of this model that would benefit 100xBot users?
+      placeholder: |
+        - Supports function calling
+        - Excellent at code generation
+        - Low latency
+        - Cost-effective
+        - Strong reasoning abilities
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-cases
+    attributes:
+      label: Use Cases
+      description: Describe specific use cases where this model would be valuable in 100xBot
+      placeholder: |
+        1. Better at web scraping tasks because...
+        2. Useful for complex reasoning workflows...
+    validations:
+      required: true
+
+  - type: input
+    id: pricing
+    attributes:
+      label: Pricing Information
+      description: What is the pricing model? (if applicable)
+      placeholder: e.g., $0.01 per 1K tokens, Free tier available, Open source
+    validations:
+      required: false
+
+  - type: textarea
+    id: authentication
+    attributes:
+      label: Authentication Requirements
+      description: What authentication/API keys are needed?
+      placeholder: |
+        - API key from provider dashboard
+        - OAuth required
+        - No authentication (local model)
+    validations:
+      required: false
+
+  - type: textarea
+    id: limitations
+    attributes:
+      label: Known Limitations
+      description: Are there any known limitations or requirements?
+      placeholder: |
+        - Rate limits
+        - Context window size
+        - Geographic restrictions
+        - Requires specific hardware for local deployment
+    validations:
+      required: false
+
+  - type: textarea
+    id: implementation-notes
+    attributes:
+      label: Implementation Notes
+      description: Any technical details that would help with implementation
+      placeholder: |
+        - Compatible with OpenAI API format
+        - Requires custom request formatting
+        - Special handling for streaming responses
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: compatibility
+    attributes:
+      label: Compatibility
+      description: Check all that apply
+      options:
+        - label: Model supports streaming responses
+        - label: Model supports function/tool calling
+        - label: Model supports vision/image inputs
+        - label: Model has OpenAI-compatible API
+        - label: I have API access to test this model
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched for existing model support requests
+          required: true
+        - label: I have provided links to official documentation
+          required: true
+        - label: The model is publicly available or in beta
+          required: true

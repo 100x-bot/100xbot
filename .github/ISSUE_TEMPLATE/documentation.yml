@@ -1,0 +1,134 @@
+name: Documentation Improvement
+description: Report missing, unclear, or incorrect documentation
+title: "[Docs]: "
+labels: ["documentation", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Help us improve 100xBot's documentation! Report issues or suggest improvements.
+
+  - type: dropdown
+    id: doc-type
+    attributes:
+      label: Documentation Type
+      description: What type of documentation needs improvement?
+      options:
+        - Getting Started Guide
+        - Installation Instructions
+        - Feature Documentation
+        - API Reference
+        - Configuration Guide
+        - Troubleshooting Guide
+        - Examples/Tutorials
+        - README
+        - Code Comments
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue Type
+      description: What kind of documentation issue is this?
+      options:
+        - Missing Documentation
+        - Incorrect/Outdated Information
+        - Unclear/Confusing Explanation
+        - Broken Links
+        - Typo/Grammar Error
+        - Missing Code Examples
+        - Missing Screenshots
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: Documentation Location
+      description: Where is this documentation located? (URL or file path)
+      placeholder: e.g., https://github.com/100x-bot/agent4/blob/main/docs/...
+    validations:
+      required: false
+
+  - type: textarea
+    id: current
+    attributes:
+      label: Current Documentation
+      description: What does the current documentation say? (copy/paste or describe)
+      placeholder: The current documentation states...
+    validations:
+      required: false
+
+  - type: textarea
+    id: issue
+    attributes:
+      label: Problem Description
+      description: What is wrong or missing? Be as specific as possible.
+      placeholder: |
+        The documentation doesn't explain...
+        The steps are unclear because...
+        The information is outdated - it says... but actually...
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested Improvement
+      description: How should the documentation be improved?
+      placeholder: |
+        The documentation should include...
+        A better explanation would be...
+        Add examples showing...
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any other context that would help improve the documentation
+      placeholder: |
+        This confused me when I was trying to...
+        Other users have asked about this in...
+        Similar projects document this by...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: audience
+    attributes:
+      label: Target Audience
+      description: Who would benefit most from this documentation improvement?
+      options:
+        - Beginners/New Users
+        - Intermediate Users
+        - Advanced Users
+        - Developers/Contributors
+        - All Users
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: willing-to-help
+    attributes:
+      label: Contribution
+      description: Would you be willing to help improve this documentation?
+      options:
+        - label: I would be willing to submit a PR with the documentation changes
+        - label: I can provide more examples or screenshots
+        - label: I can help review documentation improvements
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm the following
+      options:
+        - label: I have checked the latest version of the documentation
+          required: true
+        - label: I have searched for similar documentation issues
+          required: true
