@@ -1,11 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: 100xBot Main Repository
-    url: https://github.com/100x-bot/agent4
-    about: Visit the main codebase repository
-  - name: Documentation
-    url: https://github.com/100x-bot/agent4/tree/main/docs
-    about: Read the official documentation
+  - name: Install 100xBot
+    url: https://chromewebstore.google.com/detail/100xbot/kipkglfnhnpbogckhlmikjlfpbngnioc
+    about: Install 100xBot from the Chrome Web Store
   - name: GitHub Discussions
     url: https://github.com/100x-bot/100xbot/discussions
     about: Ask questions and discuss with the community

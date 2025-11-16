@@ -19,7 +19,7 @@ Welcome to the 100xBot Community Hub! This repository serves as the central plac
 - Support for multiple LLM providers (OpenAI, Anthropic, Google, Groq, and more)
 - Browser-based agent execution
 
-**Main Repository:** [100x-bot/agent4](https://github.com/100x-bot/agent4)
+**Install 100xBot:** [Chrome Web Store](https://chromewebstore.google.com/detail/100xbot/kipkglfnhnpbogckhlmikjlfpbngnioc)
 
 ## How to Report Issues
 
@@ -69,18 +69,17 @@ Have a question or need help? Use the [Question/Support](.github/ISSUE_TEMPLATE/
 
 ## Getting Help
 
-1. **Check the Documentation**: Visit the [main repository docs](https://github.com/100x-bot/agent4/tree/main/docs) first
-2. **Search Existing Issues**: Someone might have already reported your issue
-3. **GitHub Discussions**: For general questions and community discussions
-4. **File an Issue**: Use the appropriate template above
+1. **Search Existing Issues**: Someone might have already reported your issue
+2. **GitHub Discussions**: For general questions and community discussions
+3. **File an Issue**: Use the appropriate template above
 
 ## Installation
 
 To install 100xBot:
 
-1. Visit the [main repository](https://github.com/100x-bot/agent4)
-2. Follow the installation instructions in the README
-3. Configure your LLM provider API keys
+1. Visit the [Chrome Web Store](https://chromewebstore.google.com/detail/100xbot/kipkglfnhnpbogckhlmikjlfpbngnioc)
+2. Click "Add to Chrome" to install the extension
+3. Configure your LLM provider API keys in the extension settings
 4. Start using 100xBot in your browser
 
 ## Community Guidelines
@@ -106,30 +105,23 @@ We're building an inclusive and welcoming community. Please:
 
 ## Contributing
 
-Interested in contributing? Check out our [Contributing Guidelines](CONTRIBUTING.md) and the [main repository](https://github.com/100x-bot/agent4).
+Interested in contributing? Check out our [Contributing Guidelines](CONTRIBUTING.md).
 
 Ways to contribute:
 - Report bugs and issues
 - Request features that would benefit the community
 - Help others in discussions
 - Improve documentation
-- Submit code contributions to the main repository
 
 ## Resources
 
-- **Main Repository**: [100x-bot/agent4](https://github.com/100x-bot/agent4)
-- **Documentation**: [Official Docs](https://github.com/100x-bot/agent4/tree/main/docs)
+- **Chrome Web Store**: [Install 100xBot](https://chromewebstore.google.com/detail/100xbot/kipkglfnhnpbogckhlmikjlfpbngnioc)
 - **Discussions**: [GitHub Discussions](https://github.com/100x-bot/100xbot/discussions)
 - **Issue Tracker**: This repository
-
-## License
-
-100xBot is licensed under the MIT License. See the [main repository](https://github.com/100x-bot/agent4) for details.
 
 ## Stay Updated
 
 - Watch this repository for issue updates
-- Star the [main repository](https://github.com/100x-bot/agent4) to stay informed about releases
 - Join discussions to connect with the community
 
 ---
