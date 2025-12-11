@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Editors Test - 100xBot</title>
+    <!-- Monaco Editor -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/editor/editor.main.min.css">
+    <!-- CodeMirror -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+    <!-- Quill -->
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.0/dist/quill.snow.css" rel="stylesheet">
+    <!-- TipTap/ProseMirror basic styles -->
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 { color: #333; border-bottom: 3px solid #6c5ce7; padding-bottom: 10px; }
+        h2 { color: #555; margin-top: 40px; border-left: 4px solid #6c5ce7; padding-left: 10px; }
+        h3 { color: #666; margin-top: 20px; }
+        section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .editor-container {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        .editor-label {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .editor-label a {
+            font-size: 12px;
+            color: #6c5ce7;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            margin: 5px;
+            background: #6c5ce7;
+            color: white;
+        }
+        button:hover { background: #5b4cdb; }
+        .event-log {
+            background: #1e1e1e;
+            color: #a9dc76;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            height: 100px;
+            overflow-y: auto;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .state-display {
+            background: #2d2d2d;
+            color: #a9dc76;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 10px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        #monaco-container, #codemirror-container {
+            height: 250px;
+        }
+        .CodeMirror {
+            height: 250px !important;
+        }
+        #quill-container {
+            height: 200px;
+        }
+        .ql-editor {
+            min-height: 150px;
+        }
+        /* ProseMirror styles */
+        .ProseMirror {
+            padding: 15px;
+            min-height: 150px;
+            outline: none;
+        }
+        .ProseMirror p { margin: 0 0 10px 0; }
+        .ProseMirror:focus { background: #fafafa; }
+        /* Slate placeholder */
+        #slate-container {
+            min-height: 150px;
+            padding: 15px;
+        }
+        #slate-container [contenteditable] {
+            min-height: 150px;
+            outline: none;
+        }
+        /* ACE Editor */
+        #ace-container {
+            height: 250px;
+        }
+        .info-badge {
+            display: inline-block;
+            background: #e9ecef;
+            color: #495057;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin-left: 10px;
+        }
+        .toolbar {
+            padding: 10px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+        }
+        .toolbar button {
+            padding: 5px 10px;
+            margin: 2px;
+            background: #fff;
+            border: 1px solid #ddd;
+            color: #333;
+        }
+        .toolbar button:hover {
+            background: #e9ecef;
+        }
+        .toolbar button.active {
+            background: #6c5ce7;
+            color: white;
+            border-color: #6c5ce7;
+        }
+    </style>
+</head>
+<body>
+    <h1>📝 Text Editors Test Page</h1>
+    <p>Test page for popular text editors and rich text components.</p>
+
+    <!-- Event Log -->
+    <section>
+        <h2>📋 Event Log</h2>
+        <div id="eventLog" class="event-log"></div>
+        <button onclick="clearLog()">Clear Log</button>
+    </section>
+
+    <!-- Monaco Editor -->
+    <section>
+        <h2>1. Monaco Editor</h2>
+        <p>The editor that powers VS Code. Supports multi-cursor, intellisense, and advanced editing.</p>
+        <div class="editor-container">
+            <div class="editor-label">
+                <span>Monaco Editor <span class="info-badge">JavaScript</span></span>
+                <a href="https://microsoft.github.io/monaco-editor/" target="_blank">Docs ↗</a>
+            </div>
+            <div id="monaco-container"></div>
+        </div>
+        <button onclick="getMonacoValue()">Get Value</button>
+        <button onclick="setMonacoValue()">Set Value</button>
+        <button onclick="clearMonaco()">Clear</button>
+        <div id="monaco-state" class="state-display">Value: loading...</div>
+    </section>
+
+    <!-- CodeMirror -->
+    <section>
+        <h2>2. CodeMirror</h2>
+        <p>Versatile code editor used by many IDEs and web applications.</p>
+        <div class="editor-container">
+            <div class="editor-label">
+                <span>CodeMirror 5 <span class="info-badge">JavaScript</span></span>
+                <a href="https://codemirror.net/5/" target="_blank">Docs ↗</a>
+            </div>
+            <div id="codemirror-container"></div>
+        </div>
+        <button onclick="getCodeMirrorValue()">Get Value</button>
+        <button onclick="setCodeMirrorValue()">Set Value</button>
+        <button onclick="clearCodeMirror()">Clear</button>
+        <div id="codemirror-state" class="state-display">Value: loading...</div>
+    </section>
+
+    <!-- ACE Editor -->
+    <section>
+        <h2>3. ACE Editor</h2>
+        <p>High performance code editor for the web, used by Cloud9 IDE.</p>
+        <div class="editor-container">
+            <div class="editor-label">
+                <span>ACE Editor <span class="info-badge">JavaScript</span></span>
+                <a href="https://ace.c9.io/" target="_blank">Docs ↗</a>
+            </div>
+            <div id="ace-container"></div>
+        </div>
+        <button onclick="getAceValue()">Get Value</button>
+        <button onclick="setAceValue()">Set Value</button>
+        <button onclick="clearAce()">Clear</button>
+        <div id="ace-state" class="state-display">Value: loading...</div>
+    </section>
+
+    <!-- Quill -->
+    <section>
+        <h2>4. Quill Editor</h2>
+        <p>Modern WYSIWYG editor built for compatibility and extensibility.</p>
+        <div class="editor-container">
+            <div class="editor-label">
+                <span>Quill <span class="info-badge">Rich Text</span></span>
+                <a href="https://quilljs.com/" target="_blank">Docs ↗</a>
+            </div>
+            <div id="quill-container"></div>
+        </div>
+        <button onclick="getQuillValue()">Get Text</button>
+        <button onclick="getQuillHTML()">Get HTML</button>
+        <button onclick="setQuillValue()">Set Value</button>
+        <button onclick="clearQuill()">Clear</button>
+        <div id="quill-state" class="state-display">Value: loading...</div>
+    </section>
+
+    <!-- TinyMCE (simple contenteditable simulation) -->
+    <section>
+        <h2>5. TinyMCE-style Rich Text</h2>
+        <p>Rich text editor with formatting toolbar (simplified implementation).</p>
+        <div class="editor-container">
+            <div class="editor-label">
+                <span>Rich Text Editor <span class="info-badge">ContentEditable</span></span>
+            </div>
+            <div class="toolbar" id="tinymce-toolbar">
+                <button onclick="formatDoc('bold')" title="Bold"><b>B</b></button>
+                <button onclick="formatDoc('italic')" title="Italic"><i>I</i></button>
+                <button onclick="formatDoc('underline')" title="Underline"><u>U</u></button>
+                <button onclick="formatDoc('strikeThrough')" title="Strike">S̶</button>
+                |
+                <button onclick="formatDoc('justifyLeft')" title="Align Left">⬅</button>
+                <button onclick="formatDoc('justifyCenter')" title="Center">⬌</button>
+                <button onclick="formatDoc('justifyRight')" title="Align Right">➡</button>
+                |
+                <button onclick="formatDoc('insertUnorderedList')" title="Bullet List">•</button>
+                <button onclick="formatDoc('insertOrderedList')" title="Numbered List">1.</button>
+                |
+                <button onclick="formatDoc('createLink', prompt('Enter URL:'))" title="Link">🔗</button>
+            </div>
+            <div id="tinymce-container" contenteditable="true" style="min-height: 150px; padding: 15px; outline: none;">
+                <p>This is a <b>rich text</b> editor with <i>formatting</i> support.</p>
+                <p>Try selecting text and using the toolbar buttons!</p>
+            </div>
+        </div>
+        <button onclick="getTinyMCEValue()">Get HTML</button>
+        <button onclick="getTinyMCEText()">Get Text</button>
+        <button onclick="clearTinyMCE()">Clear</button>
+        <div id="tinymce-state" class="state-display">Value: ...</div>
+    </section>
+
+    <!-- Draft.js style (React-based, simplified) -->
+    <section>
+        <h2>6. Draft.js / Slate-style Editor</h2>
+        <p>Block-based rich text editor pattern (simplified contenteditable).</p>
+        <div class="editor-container">
+            <div class="editor-label">
+                <span>Block Editor <span class="info-badge">Blocks</span></span>
+            </div>
+            <div id="slate-container">
+                <div contenteditable="true" data-testid="slate-editor" style="outline: none;">
+                    <p data-block="paragraph">Start typing here...</p>
+                    <p data-block="paragraph">Each paragraph is a block.</p>
+                </div>
+            </div>
+        </div>
+        <button onclick="getSlateValue()">Get Content</button>
+        <button onclick="addSlateBlock()">Add Block</button>
+        <button onclick="clearSlate()">Clear</button>
+        <div id="slate-state" class="state-display">Blocks: ...</div>
+    </section>
+
+    <!-- ProseMirror -->
+    <section>
+        <h2>7. ProseMirror</h2>
+        <p>Toolkit for building rich text editors, powers many apps including Notion.</p>
+        <div class="editor-container">
+            <div class="editor-label">
+                <span>ProseMirror <span class="info-badge">Rich Text</span></span>
+                <a href="https://prosemirror.net/" target="_blank">Docs ↗</a>
+            </div>
+            <div id="prosemirror-container"></div>
+        </div>
+        <button onclick="getProseMirrorValue()">Get Content</button>
+        <button onclick="setProseMirrorValue()">Set Value</button>
+        <button onclick="clearProseMirror()">Clear</button>
+        <div id="prosemirror-state" class="state-display">Value: loading...</div>
+    </section>
+
+    <!-- Markdown Editor -->
+    <section>
+        <h2>8. Markdown Editor</h2>
+        <p>Simple markdown editor with live preview.</p>
+        <div class="editor-container">
+            <div class="editor-label">
+                <span>Markdown <span class="info-badge">Plain Text</span></span>
+            </div>
+            <div style="display: flex;">
+                <div style="flex: 1; border-right: 1px solid #ddd;">
+                    <textarea id="markdown-input" style="width: 100%; height: 200px; border: none; padding: 15px; resize: none; font-family: monospace;" placeholder="# Write markdown here...
+
+**Bold** and *italic* text.
+
+- List item 1
+- List item 2
+
+[Link](https://example.com)"></textarea>
+                </div>
+                <div id="markdown-preview" style="flex: 1; padding: 15px; background: #fafafa; min-height: 200px;"></div>
+            </div>
+        </div>
+        <button onclick="getMarkdownValue()">Get Markdown</button>
+        <button onclick="clearMarkdown()">Clear</button>
+        <div id="markdown-state" class="state-display">Markdown: ...</div>
+    </section>
+
+    <!-- Load Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.0/dist/quill.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.2/ace.js"></script>
+    <!-- ProseMirror -->
+    <script src="https://cdn.jsdelivr.net/npm/prosemirror-state@1.4.3/dist/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prosemirror-view@1.32.4/dist/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prosemirror-model@1.19.4/dist/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prosemirror-schema-basic@1.2.2/dist/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prosemirror-history@1.3.2/dist/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prosemirror-keymap@1.2.2/dist/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prosemirror-commands@1.5.2/dist/index.min.js"></script>
+
+    <script>
+        // Event Logger
+        function logEvent(message) {
+            const log = document.getElementById('eventLog');
+            const time = new Date().toLocaleTimeString();
+            log.innerHTML += `[${time}] ${message}\n`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('eventLog').innerHTML = '';
+        }
+
+        // Initialize editors
+        let monacoEditor, codeMirrorEditor, aceEditor, quillEditor, proseMirrorView;
+
+        // Monaco Editor
+        require = { paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' } };
+
+        const monacoScript = document.createElement('script');
+        monacoScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js';
+        monacoScript.onload = () => {
+            require(['vs/editor/editor.main'], function() {
+                monacoEditor = monaco.editor.create(document.getElementById('monaco-container'), {
+                    value: '// Monaco Editor\nfunction hello() {\n    console.log("Hello, World!");\n}\n\nhello();',
+                    language: 'javascript',
+                    theme: 'vs-dark',
+                    minimap: { enabled: false },
+                    automaticLayout: true
+                });
+
+                monacoEditor.onDidChangeModelContent(() => {
+                    logEvent('Monaco: content changed');
+                    document.getElementById('monaco-state').textContent = 'Value: ' + monacoEditor.getValue().substring(0, 100) + '...';
+                });
+
+                logEvent('Monaco Editor initialized');
+                document.getElementById('monaco-state').textContent = 'Value: ' + monacoEditor.getValue().substring(0, 100) + '...';
+            });
+        };
+        document.head.appendChild(monacoScript);
+
+        function getMonacoValue() {
+            const val = monacoEditor?.getValue() || '';
+            logEvent(`Monaco getValue: ${val.length} chars`);
+            document.getElementById('monaco-state').textContent = 'Value: ' + val;
+        }
+
+        function setMonacoValue() {
+            monacoEditor?.setValue('// New content\nconsole.log("Set via API");');
+            logEvent('Monaco setValue called');
+        }
+
+        function clearMonaco() {
+            monacoEditor?.setValue('');
+            logEvent('Monaco cleared');
+        }
+
+        // CodeMirror
+        document.addEventListener('DOMContentLoaded', () => {
+            codeMirrorEditor = CodeMirror(document.getElementById('codemirror-container'), {
+                value: '// CodeMirror Editor\nconst greeting = "Hello";\nconsole.log(greeting);',
+                mode: 'javascript',
+                theme: 'dracula',
+                lineNumbers: true
+            });
+
+            codeMirrorEditor.on('change', () => {
+                logEvent('CodeMirror: content changed');
+                document.getElementById('codemirror-state').textContent = 'Value: ' + codeMirrorEditor.getValue().substring(0, 100) + '...';
+            });
+
+            logEvent('CodeMirror initialized');
+            document.getElementById('codemirror-state').textContent = 'Value: ' + codeMirrorEditor.getValue().substring(0, 100) + '...';
+        });
+
+        function getCodeMirrorValue() {
+            const val = codeMirrorEditor?.getValue() || '';
+            logEvent(`CodeMirror getValue: ${val.length} chars`);
+            document.getElementById('codemirror-state').textContent = 'Value: ' + val;
+        }
+
+        function setCodeMirrorValue() {
+            codeMirrorEditor?.setValue('// New content\nalert("Set via API");');
+            logEvent('CodeMirror setValue called');
+        }
+
+        function clearCodeMirror() {
+            codeMirrorEditor?.setValue('');
+            logEvent('CodeMirror cleared');
+        }
+
+        // ACE Editor
+        document.addEventListener('DOMContentLoaded', () => {
+            aceEditor = ace.edit('ace-container');
+            aceEditor.setTheme('ace/theme/monokai');
+            aceEditor.session.setMode('ace/mode/javascript');
+            aceEditor.setValue('// ACE Editor\nfunction example() {\n    return "Hello from ACE!";\n}', -1);
+
+            aceEditor.session.on('change', () => {
+                logEvent('ACE: content changed');
+                document.getElementById('ace-state').textContent = 'Value: ' + aceEditor.getValue().substring(0, 100) + '...';
+            });
+
+            logEvent('ACE Editor initialized');
+            document.getElementById('ace-state').textContent = 'Value: ' + aceEditor.getValue().substring(0, 100) + '...';
+        });
+
+        function getAceValue() {
+            const val = aceEditor?.getValue() || '';
+            logEvent(`ACE getValue: ${val.length} chars`);
+            document.getElementById('ace-state').textContent = 'Value: ' + val;
+        }
+
+        function setAceValue() {
+            aceEditor?.setValue('// New ACE content\nconsole.log("Set via API");', -1);
+            logEvent('ACE setValue called');
+        }
+
+        function clearAce() {
+            aceEditor?.setValue('', -1);
+            logEvent('ACE cleared');
+        }
+
+        // Quill Editor
+        document.addEventListener('DOMContentLoaded', () => {
+            quillEditor = new Quill('#quill-container', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['link', 'image'],
+                        ['clean']
+                    ]
+                },
+                placeholder: 'Write something...'
+            });
+
+            quillEditor.root.innerHTML = '<p>This is <strong>Quill</strong> editor with <em>rich text</em> support.</p>';
+
+            quillEditor.on('text-change', () => {
+                logEvent('Quill: content changed');
+                document.getElementById('quill-state').textContent = 'Text: ' + quillEditor.getText().substring(0, 100) + '...';
+            });
+
+            logEvent('Quill initialized');
+            document.getElementById('quill-state').textContent = 'Text: ' + quillEditor.getText().substring(0, 100) + '...';
+        });
+
+        function getQuillValue() {
+            const val = quillEditor?.getText() || '';
+            logEvent(`Quill getText: ${val.length} chars`);
+            document.getElementById('quill-state').textContent = 'Text: ' + val;
+        }
+
+        function getQuillHTML() {
+            const val = quillEditor?.root.innerHTML || '';
+            logEvent(`Quill getHTML: ${val.length} chars`);
+            document.getElementById('quill-state').textContent = 'HTML: ' + val;
+        }
+
+        function setQuillValue() {
+            quillEditor?.root.innerHTML = '<p>New <strong>Quill</strong> content!</p>';
+            logEvent('Quill content set');
+        }
+
+        function clearQuill() {
+            quillEditor?.setText('');
+            logEvent('Quill cleared');
+        }
+
+        // TinyMCE-style Rich Text
+        const tinymceContainer = document.getElementById('tinymce-container');
+        tinymceContainer.addEventListener('input', () => {
+            logEvent('RichText: content changed');
+            document.getElementById('tinymce-state').textContent = 'HTML: ' + tinymceContainer.innerHTML.substring(0, 100) + '...';
+        });
+
+        function formatDoc(cmd, value = null) {
+            document.execCommand(cmd, false, value);
+            tinymceContainer.focus();
+            logEvent(`RichText: format ${cmd}`);
+        }
+
+        function getTinyMCEValue() {
+            const val = tinymceContainer.innerHTML;
+            logEvent(`RichText getHTML: ${val.length} chars`);
+            document.getElementById('tinymce-state').textContent = 'HTML: ' + val;
+        }
+
+        function getTinyMCEText() {
+            const val = tinymceContainer.textContent;
+            logEvent(`RichText getText: ${val.length} chars`);
+            document.getElementById('tinymce-state').textContent = 'Text: ' + val;
+        }
+
+        function clearTinyMCE() {
+            tinymceContainer.innerHTML = '<p><br></p>';
+            logEvent('RichText cleared');
+        }
+
+        // Slate-style Editor
+        const slateEditor = document.querySelector('#slate-container [contenteditable]');
+        slateEditor.addEventListener('input', () => {
+            logEvent('Slate: content changed');
+            const blocks = slateEditor.querySelectorAll('[data-block]');
+            document.getElementById('slate-state').textContent = `Blocks: ${blocks.length}`;
+        });
+
+        function getSlateValue() {
+            const blocks = slateEditor.querySelectorAll('[data-block]');
+            const content = Array.from(blocks).map(b => b.textContent);
+            logEvent(`Slate: ${blocks.length} blocks`);
+            document.getElementById('slate-state').textContent = 'Content: ' + JSON.stringify(content);
+        }
+
+        function addSlateBlock() {
+            const p = document.createElement('p');
+            p.setAttribute('data-block', 'paragraph');
+            p.textContent = 'New block added...';
+            slateEditor.appendChild(p);
+            logEvent('Slate: block added');
+        }
+
+        function clearSlate() {
+            slateEditor.innerHTML = '<p data-block="paragraph"><br></p>';
+            logEvent('Slate cleared');
+        }
+
+        // ProseMirror (simplified - may not load if CDN issues)
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                // Check if ProseMirror loaded
+                if (typeof PM !== 'undefined' || typeof prosemirror !== 'undefined') {
+                    // ProseMirror initialization would go here
+                    logEvent('ProseMirror: checking availability...');
+                }
+
+                // Fallback to simple contenteditable
+                const pmContainer = document.getElementById('prosemirror-container');
+                pmContainer.innerHTML = '<div contenteditable="true" class="ProseMirror" data-testid="prosemirror-editor"><p>ProseMirror-style editor (simplified contenteditable fallback).</p><p>Type here to test...</p></div>';
+
+                const pmEditor = pmContainer.querySelector('[contenteditable]');
+                pmEditor.addEventListener('input', () => {
+                    logEvent('ProseMirror: content changed');
+                    document.getElementById('prosemirror-state').textContent = 'Content: ' + pmEditor.textContent.substring(0, 100) + '...';
+                });
+
+                logEvent('ProseMirror fallback initialized');
+                document.getElementById('prosemirror-state').textContent = 'Content: ' + pmEditor.textContent.substring(0, 100) + '...';
+            } catch (e) {
+                logEvent('ProseMirror: ' + e.message);
+            }
+        });
+
+        function getProseMirrorValue() {
+            const editor = document.querySelector('#prosemirror-container [contenteditable]');
+            const val = editor?.textContent || '';
+            logEvent(`ProseMirror getValue: ${val.length} chars`);
+            document.getElementById('prosemirror-state').textContent = 'Content: ' + val;
+        }
+
+        function setProseMirrorValue() {
+            const editor = document.querySelector('#prosemirror-container [contenteditable]');
+            if (editor) {
+                editor.innerHTML = '<p>New ProseMirror content!</p>';
+                logEvent('ProseMirror content set');
+            }
+        }
+
+        function clearProseMirror() {
+            const editor = document.querySelector('#prosemirror-container [contenteditable]');
+            if (editor) {
+                editor.innerHTML = '<p><br></p>';
+                logEvent('ProseMirror cleared');
+            }
+        }
+
+        // Markdown Editor
+        const markdownInput = document.getElementById('markdown-input');
+        const markdownPreview = document.getElementById('markdown-preview');
+
+        function simpleMarkdown(text) {
+            return text
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+                .replace(/^- (.*$)/gim, '<li>$1</li>')
+                .replace(/\n/g, '<br>');
+        }
+
+        markdownInput.addEventListener('input', () => {
+            const html = simpleMarkdown(markdownInput.value);
+            markdownPreview.innerHTML = html || '<em>Preview will appear here...</em>';
+            logEvent('Markdown: content changed');
+            document.getElementById('markdown-state').textContent = 'Markdown: ' + markdownInput.value.substring(0, 100) + '...';
+        });
+
+        function getMarkdownValue() {
+            const val = markdownInput.value;
+            logEvent(`Markdown getValue: ${val.length} chars`);
+            document.getElementById('markdown-state').textContent = 'Markdown: ' + val;
+        }
+
+        function clearMarkdown() {
+            markdownInput.value = '';
+            markdownPreview.innerHTML = '<em>Preview will appear here...</em>';
+            logEvent('Markdown cleared');
+        }
+
+        // Initial
+        logEvent('Editors test page loaded');
+    </script>
+</body>
+</html>

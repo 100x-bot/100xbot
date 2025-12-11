@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Components Test - 100xBot</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 { color: #61dafb; border-bottom: 3px solid #61dafb; padding-bottom: 10px; }
+        h2 { color: #555; margin-top: 40px; border-left: 4px solid #61dafb; padding-left: 10px; }
+        section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .component-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 15px 0;
+        }
+        .component {
+            flex: 1;
+            min-width: 280px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #444;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #61dafb;
+            box-shadow: 0 0 0 3px rgba(97, 218, 251, 0.2);
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            background: #61dafb;
+            color: #000;
+        }
+        button:hover { background: #4fa8c7; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .event-log {
+            background: #1e1e1e;
+            color: #61dafb;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            height: 100px;
+            overflow-y: auto;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .state-display {
+            background: #282c34;
+            color: #98c379;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        .error { color: #e06c75; }
+        .success { color: #98c379; }
+        .tag {
+            display: inline-block;
+            background: #61dafb;
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin: 2px;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .checkbox-label input { width: auto; }
+    </style>
+</head>
+<body>
+    <h1>⚛️ React Components Test Page</h1>
+    <p>Test page for React controlled components and common patterns.</p>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useCallback } = React;
+
+        // Event Logger Component
+        function EventLog({ logs, onClear }) {
+            const logRef = useRef(null);
+            useEffect(() => {
+                if (logRef.current) {
+                    logRef.current.scrollTop = logRef.current.scrollHeight;
+                }
+            }, [logs]);
+
+            return (
+                <section>
+                    <h2>📋 Event Log</h2>
+                    <div ref={logRef} className="event-log">
+                        {logs.map((log, i) => <div key={i}>{log}</div>)}
+                    </div>
+                    <button onClick={onClear}>Clear Log</button>
+                </section>
+            );
+        }
+
+        // 1. Basic Controlled Input
+        function ControlledInput({ onLog }) {
+            const [value, setValue] = useState('');
+
+            const handleChange = (e) => {
+                setValue(e.target.value);
+                onLog(`ControlledInput: value="${e.target.value}"`);
+            };
+
+            return (
+                <div className="component">
+                    <label>Basic Controlled Input</label>
+                    <input
+                        type="text"
+                        value={value}
+                        onChange={handleChange}
+                        placeholder="Type here..."
+                        data-testid="controlled-input"
+                    />
+                    <div className="state-display">State: "{value}"</div>
+                </div>
+            );
+        }
+
+        // 2. Controlled Input with Transform
+        function TransformInput({ onLog }) {
+            const [value, setValue] = useState('');
+
+            const handleChange = (e) => {
+                const transformed = e.target.value.toUpperCase();
+                setValue(transformed);
+                onLog(`TransformInput: "${e.target.value}" → "${transformed}"`);
+            };
+
+            return (
+                <div className="component">
+                    <label>Transform Input (Uppercase)</label>
+                    <input
+                        type="text"
+                        value={value}
+                        onChange={handleChange}
+                        placeholder="Text will be uppercase..."
+                        data-testid="transform-input"
+                    />
+                    <div className="state-display">State: "{value}"</div>
+                </div>
+            );
+        }
+
+        // 3. Debounced Input
+        function DebouncedInput({ onLog }) {
+            const [value, setValue] = useState('');
+            const [debouncedValue, setDebouncedValue] = useState('');
+
+            useEffect(() => {
+                const timer = setTimeout(() => {
+                    setDebouncedValue(value);
+                    if (value) onLog(`DebouncedInput: debounced="${value}"`);
+                }, 500);
+                return () => clearTimeout(timer);
+            }, [value]);
+
+            return (
+                <div className="component">
+                    <label>Debounced Input (500ms)</label>
+                    <input
+                        type="text"
+                        value={value}
+                        onChange={(e) => setValue(e.target.value)}
+                        placeholder="Debounces after 500ms..."
+                        data-testid="debounced-input"
+                    />
+                    <div className="state-display">
+                        Immediate: "{value}"<br/>
+                        Debounced: "{debouncedValue}"
+                    </div>
+                </div>
+            );
+        }
+
+        // 4. Validated Input
+        function ValidatedInput({ onLog }) {
+            const [value, setValue] = useState('');
+            const [error, setError] = useState('');
+            const [touched, setTouched] = useState(false);
+
+            const validate = (val) => {
+                if (!val) return 'Required';
+                if (val.length < 3) return 'Min 3 characters';
+                if (!/^[a-zA-Z0-9]+$/.test(val)) return 'Alphanumeric only';
+                return '';
+            };
+
+            const handleChange = (e) => {
+                const newValue = e.target.value;
+                setValue(newValue);
+                const err = validate(newValue);
+                setError(err);
+                onLog(`ValidatedInput: value="${newValue}", error="${err}"`);
+            };
+
+            return (
+                <div className="component">
+                    <label>Validated Input (min 3 chars, alphanumeric)</label>
+                    <input
+                        type="text"
+                        value={value}
+                        onChange={handleChange}
+                        onBlur={() => setTouched(true)}
+                        placeholder="Enter username..."
+                        data-testid="validated-input"
+                        style={{ borderColor: touched && error ? '#e06c75' : undefined }}
+                    />
+                    {touched && error && <div className="error">{error}</div>}
+                    {touched && !error && value && <div className="success">✓ Valid</div>}
+                </div>
+            );
+        }
+
+        // 5. Controlled Textarea
+        function ControlledTextarea({ onLog }) {
+            const [value, setValue] = useState('');
+            const maxLength = 200;
+
+            return (
+                <div className="component">
+                    <label>Controlled Textarea ({value.length}/{maxLength})</label>
+                    <textarea
+                        value={value}
+                        onChange={(e) => {
+                            if (e.target.value.length <= maxLength) {
+                                setValue(e.target.value);
+                                onLog(`Textarea: ${e.target.value.length} chars`);
+                            }
+                        }}
+                        rows={4}
+                        placeholder="Max 200 characters..."
+                        data-testid="controlled-textarea"
+                    />
+                </div>
+            );
+        }
+
+        // 6. Controlled Select
+        function ControlledSelect({ onLog }) {
+            const [value, setValue] = useState('');
+
+            return (
+                <div className="component">
+                    <label>Controlled Select</label>
+                    <select
+                        value={value}
+                        onChange={(e) => {
+                            setValue(e.target.value);
+                            onLog(`Select: selected="${e.target.value}"`);
+                        }}
+                        data-testid="controlled-select"
+                    >
+                        <option value="">-- Choose --</option>
+                        <option value="react">React</option>
+                        <option value="vue">Vue</option>
+                        <option value="angular">Angular</option>
+                        <option value="svelte">Svelte</option>
+                    </select>
+                    <div className="state-display">Selected: "{value}"</div>
+                </div>
+            );
+        }
+
+        // 7. Controlled Checkboxes
+        function ControlledCheckboxes({ onLog }) {
+            const [checked, setChecked] = useState({
+                option1: false,
+                option2: true,
+                option3: false
+            });
+
+            const handleChange = (key) => {
+                const newChecked = { ...checked, [key]: !checked[key] };
+                setChecked(newChecked);
+                onLog(`Checkbox ${key}: ${newChecked[key]}`);
+            };
+
+            return (
+                <div className="component">
+                    <label>Controlled Checkboxes</label>
+                    {Object.keys(checked).map(key => (
+                        <label key={key} className="checkbox-label">
+                            <input
+                                type="checkbox"
+                                checked={checked[key]}
+                                onChange={() => handleChange(key)}
+                                data-testid={`checkbox-${key}`}
+                            />
+                            {key}
+                        </label>
+                    ))}
+                    <div className="state-display">
+                        State: {JSON.stringify(checked)}
+                    </div>
+                </div>
+            );
+        }
+
+        // 8. Controlled Radio
+        function ControlledRadio({ onLog }) {
+            const [value, setValue] = useState('medium');
+
+            return (
+                <div className="component">
+                    <label>Controlled Radio Buttons</label>
+                    {['small', 'medium', 'large'].map(size => (
+                        <label key={size} className="checkbox-label">
+                            <input
+                                type="radio"
+                                name="size"
+                                value={size}
+                                checked={value === size}
+                                onChange={(e) => {
+                                    setValue(e.target.value);
+                                    onLog(`Radio: selected="${e.target.value}"`);
+                                }}
+                                data-testid={`radio-${size}`}
+                            />
+                            {size.charAt(0).toUpperCase() + size.slice(1)}
+                        </label>
+                    ))}
+                    <div className="state-display">Selected: "{value}"</div>
+                </div>
+            );
+        }
+
+        // 9. Autocomplete Component
+        function Autocomplete({ onLog }) {
+            const [value, setValue] = useState('');
+            const [suggestions, setSuggestions] = useState([]);
+            const [highlightedIndex, setHighlightedIndex] = useState(-1);
+            const [isOpen, setIsOpen] = useState(false);
+
+            const allSuggestions = [
+                'JavaScript', 'TypeScript', 'Python', 'Java', 'C++',
+                'Ruby', 'Go', 'Rust', 'Swift', 'Kotlin'
+            ];
+
+            const handleChange = (e) => {
+                const val = e.target.value;
+                setValue(val);
+                const filtered = allSuggestions.filter(s =>
+                    s.toLowerCase().includes(val.toLowerCase())
+                );
+                setSuggestions(filtered);
+                setIsOpen(val.length > 0 && filtered.length > 0);
+                setHighlightedIndex(-1);
+                onLog(`Autocomplete: typing="${val}"`);
+            };
+
+            const handleKeyDown = (e) => {
+                if (!isOpen) return;
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setHighlightedIndex(i => Math.min(i + 1, suggestions.length - 1));
+                    onLog('Autocomplete: ArrowDown');
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setHighlightedIndex(i => Math.max(i - 1, 0));
+                    onLog('Autocomplete: ArrowUp');
+                } else if (e.key === 'Enter' && highlightedIndex >= 0) {
+                    e.preventDefault();
+                    const selected = suggestions[highlightedIndex];
+                    setValue(selected);
+                    setIsOpen(false);
+                    onLog(`Autocomplete: selected="${selected}"`);
+                } else if (e.key === 'Escape') {
+                    setIsOpen(false);
+                    onLog('Autocomplete: Escape');
+                }
+            };
+
+            const handleSelect = (suggestion) => {
+                setValue(suggestion);
+                setIsOpen(false);
+                onLog(`Autocomplete: clicked="${suggestion}"`);
+            };
+
+            return (
+                <div className="component">
+                    <label>Autocomplete (Arrow Keys + Enter)</label>
+                    <div style={{ position: 'relative' }}>
+                        <input
+                            type="text"
+                            value={value}
+                            onChange={handleChange}
+                            onKeyDown={handleKeyDown}
+                            onFocus={() => value && setSuggestions(allSuggestions.filter(s =>
+                                s.toLowerCase().includes(value.toLowerCase())
+                            ))}
+                            onBlur={() => setTimeout(() => setIsOpen(false), 200)}
+                            placeholder="Type a programming language..."
+                            data-testid="autocomplete-input"
+                            role="combobox"
+                            aria-expanded={isOpen}
+                        />
+                        {isOpen && (
+                            <div style={{
+                                position: 'absolute',
+                                top: '100%',
+                                left: 0,
+                                right: 0,
+                                background: 'white',
+                                border: '1px solid #ddd',
+                                borderTop: 'none',
+                                borderRadius: '0 0 4px 4px',
+                                maxHeight: '200px',
+                                overflowY: 'auto',
+                                zIndex: 100
+                            }}>
+                                {suggestions.map((s, i) => (
+                                    <div
+                                        key={s}
+                                        onClick={() => handleSelect(s)}
+                                        style={{
+                                            padding: '10px',
+                                            cursor: 'pointer',
+                                            background: i === highlightedIndex ? '#61dafb' : 'white',
+                                            color: i === highlightedIndex ? '#000' : '#333'
+                                        }}
+                                        data-testid={`suggestion-${i}`}
+                                    >
+                                        {s}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    <div className="state-display">Value: "{value}"</div>
+                </div>
+            );
+        }
+
+        // 10. Tag Input
+        function TagInput({ onLog }) {
+            const [inputValue, setInputValue] = useState('');
+            const [tags, setTags] = useState(['react', 'javascript']);
+
+            const handleKeyDown = (e) => {
+                if (e.key === 'Enter' && inputValue.trim()) {
+                    e.preventDefault();
+                    const newTag = inputValue.trim().toLowerCase();
+                    if (!tags.includes(newTag)) {
+                        setTags([...tags, newTag]);
+                        onLog(`TagInput: added="${newTag}"`);
+                    }
+                    setInputValue('');
+                } else if (e.key === 'Backspace' && !inputValue && tags.length) {
+                    const removed = tags[tags.length - 1];
+                    setTags(tags.slice(0, -1));
+                    onLog(`TagInput: removed="${removed}"`);
+                }
+            };
+
+            const removeTag = (tagToRemove) => {
+                setTags(tags.filter(t => t !== tagToRemove));
+                onLog(`TagInput: removed="${tagToRemove}"`);
+            };
+
+            return (
+                <div className="component">
+                    <label>Tag Input (Enter to add, Backspace to remove)</label>
+                    <div style={{ border: '1px solid #ddd', borderRadius: '4px', padding: '5px', display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                        {tags.map(tag => (
+                            <span key={tag} className="tag">
+                                {tag}
+                                <span onClick={() => removeTag(tag)} style={{ marginLeft: '5px', cursor: 'pointer' }}>×</span>
+                            </span>
+                        ))}
+                        <input
+                            type="text"
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            placeholder="Add tag..."
+                            style={{ border: 'none', outline: 'none', flex: 1, minWidth: '100px' }}
+                            data-testid="tag-input"
+                        />
+                    </div>
+                    <div className="state-display">Tags: {JSON.stringify(tags)}</div>
+                </div>
+            );
+        }
+
+        // 11. Form with Submit
+        function ControlledForm({ onLog }) {
+            const [formData, setFormData] = useState({
+                name: '',
+                email: '',
+                message: ''
+            });
+            const [submitted, setSubmitted] = useState(false);
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                setSubmitted(true);
+                onLog(`Form submitted: ${JSON.stringify(formData)}`);
+                setTimeout(() => setSubmitted(false), 2000);
+            };
+
+            const handleChange = (field) => (e) => {
+                setFormData({ ...formData, [field]: e.target.value });
+            };
+
+            return (
+                <div className="component" style={{ minWidth: '100%' }}>
+                    <label>Controlled Form (Submit with Enter or Button)</label>
+                    <form onSubmit={handleSubmit}>
+                        <input
+                            type="text"
+                            value={formData.name}
+                            onChange={handleChange('name')}
+                            placeholder="Name"
+                            data-testid="form-name"
+                            style={{ marginBottom: '10px' }}
+                        />
+                        <input
+                            type="email"
+                            value={formData.email}
+                            onChange={handleChange('email')}
+                            placeholder="Email"
+                            data-testid="form-email"
+                            style={{ marginBottom: '10px' }}
+                        />
+                        <textarea
+                            value={formData.message}
+                            onChange={handleChange('message')}
+                            placeholder="Message"
+                            data-testid="form-message"
+                            rows={3}
+                            style={{ marginBottom: '10px' }}
+                        />
+                        <button type="submit" data-testid="form-submit">Submit</button>
+                        {submitted && <span className="success" style={{ marginLeft: '10px' }}>✓ Submitted!</span>}
+                    </form>
+                    <div className="state-display">Form State: {JSON.stringify(formData)}</div>
+                </div>
+            );
+        }
+
+        // 12. useRef Uncontrolled Input
+        function UncontrolledInput({ onLog }) {
+            const inputRef = useRef(null);
+            const [lastValue, setLastValue] = useState('');
+
+            const handleClick = () => {
+                const value = inputRef.current.value;
+                setLastValue(value);
+                onLog(`UncontrolledInput: ref.value="${value}"`);
+            };
+
+            return (
+                <div className="component">
+                    <label>Uncontrolled Input (useRef)</label>
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        defaultValue="default value"
+                        placeholder="Uncontrolled..."
+                        data-testid="uncontrolled-input"
+                    />
+                    <button onClick={handleClick}>Get Value</button>
+                    <div className="state-display">Last read value: "{lastValue}"</div>
+                </div>
+            );
+        }
+
+        // Main App
+        function App() {
+            const [logs, setLogs] = useState([`[${new Date().toLocaleTimeString()}] React test page loaded`]);
+
+            const addLog = useCallback((message) => {
+                const time = new Date().toLocaleTimeString();
+                setLogs(prev => [...prev, `[${time}] ${message}`]);
+            }, []);
+
+            const clearLogs = useCallback(() => {
+                setLogs([]);
+            }, []);
+
+            return (
+                <div>
+                    <EventLog logs={logs} onClear={clearLogs} />
+
+                    <section>
+                        <h2>1. Basic Controlled Components</h2>
+                        <div className="component-row">
+                            <ControlledInput onLog={addLog} />
+                            <TransformInput onLog={addLog} />
+                            <DebouncedInput onLog={addLog} />
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>2. Validation & Textarea</h2>
+                        <div className="component-row">
+                            <ValidatedInput onLog={addLog} />
+                            <ControlledTextarea onLog={addLog} />
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>3. Select, Checkbox & Radio</h2>
+                        <div className="component-row">
+                            <ControlledSelect onLog={addLog} />
+                            <ControlledCheckboxes onLog={addLog} />
+                            <ControlledRadio onLog={addLog} />
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>4. Autocomplete & Tag Input</h2>
+                        <div className="component-row">
+                            <Autocomplete onLog={addLog} />
+                            <TagInput onLog={addLog} />
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>5. Form & Uncontrolled</h2>
+                        <div className="component-row">
+                            <ControlledForm onLog={addLog} />
+                        </div>
+                        <div className="component-row">
+                            <UncontrolledInput onLog={addLog} />
+                        </div>
+                    </section>
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

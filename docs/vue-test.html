@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue Components Test - 100xBot</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 { color: #42b883; border-bottom: 3px solid #42b883; padding-bottom: 10px; }
+        h2 { color: #555; margin-top: 40px; border-left: 4px solid #42b883; padding-left: 10px; }
+        section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .component-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 15px 0;
+        }
+        .component {
+            flex: 1;
+            min-width: 280px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #444;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #42b883;
+            box-shadow: 0 0 0 3px rgba(66, 184, 131, 0.2);
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            background: #42b883;
+            color: white;
+        }
+        button:hover { background: #3aa876; }
+        .event-log {
+            background: #1e1e1e;
+            color: #42b883;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            height: 100px;
+            overflow-y: auto;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .state-display {
+            background: #2c3e50;
+            color: #42b883;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        .error { color: #e74c3c; }
+        .success { color: #42b883; }
+        .tag {
+            display: inline-block;
+            background: #42b883;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin: 2px;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            margin: 5px 0;
+        }
+        .checkbox-label input { width: auto; }
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        .autocomplete-item {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .autocomplete-item:hover, .autocomplete-item.highlighted {
+            background: #42b883;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>💚 Vue Components Test Page</h1>
+    <p>Test page for Vue 3 reactive components with v-model and composition API.</p>
+
+    <div id="app"></div>
+
+    <script>
+        const { createApp, ref, reactive, computed, watch, onMounted } = Vue;
+
+        const app = createApp({
+            setup() {
+                // Event Log
+                const logs = ref([`[${new Date().toLocaleTimeString()}] Vue test page loaded`]);
+                const logRef = ref(null);
+
+                const addLog = (message) => {
+                    const time = new Date().toLocaleTimeString();
+                    logs.value.push(`[${time}] ${message}`);
+                    setTimeout(() => {
+                        if (logRef.value) {
+                            logRef.value.scrollTop = logRef.value.scrollHeight;
+                        }
+                    }, 0);
+                };
+
+                const clearLogs = () => {
+                    logs.value = [];
+                };
+
+                // 1. Basic v-model
+                const basicInput = ref('');
+                watch(basicInput, (val) => addLog(`BasicInput: "${val}"`));
+
+                // 2. v-model with modifier (.trim, .number, .lazy)
+                const trimInput = ref('');
+                const numberInput = ref(0);
+                const lazyInput = ref('');
+
+                watch(trimInput, (val) => addLog(`TrimInput: "${val}"`));
+                watch(numberInput, (val) => addLog(`NumberInput: ${val} (type: ${typeof val})`));
+                watch(lazyInput, (val) => addLog(`LazyInput: "${val}"`));
+
+                // 3. Computed + v-model (two-way computed)
+                const firstName = ref('');
+                const lastName = ref('');
+                const fullName = computed({
+                    get: () => `${firstName.value} ${lastName.value}`.trim(),
+                    set: (val) => {
+                        const parts = val.split(' ');
+                        firstName.value = parts[0] || '';
+                        lastName.value = parts.slice(1).join(' ') || '';
+                    }
+                });
+
+                watch(fullName, (val) => addLog(`FullName: "${val}"`));
+
+                // 4. Textarea with character count
+                const textareaValue = ref('');
+                const maxLength = 200;
+                const charCount = computed(() => textareaValue.value.length);
+
+                watch(textareaValue, (val) => addLog(`Textarea: ${val.length} chars`));
+
+                // 5. Select (single and multiple)
+                const selectedSingle = ref('');
+                const selectedMultiple = ref([]);
+
+                watch(selectedSingle, (val) => addLog(`Select: "${val}"`));
+                watch(selectedMultiple, (val) => addLog(`MultiSelect: ${JSON.stringify(val)}`), { deep: true });
+
+                // 6. Checkboxes
+                const checkboxes = reactive({
+                    option1: false,
+                    option2: true,
+                    option3: false
+                });
+
+                watch(() => ({ ...checkboxes }), (val) => addLog(`Checkboxes: ${JSON.stringify(val)}`));
+
+                // 7. Radio
+                const radioValue = ref('medium');
+                watch(radioValue, (val) => addLog(`Radio: "${val}"`));
+
+                // 8. Autocomplete
+                const autocompleteInput = ref('');
+                const suggestions = ref([]);
+                const highlightedIndex = ref(-1);
+                const isOpen = ref(false);
+                const allSuggestions = ['JavaScript', 'TypeScript', 'Python', 'Java', 'C++', 'Ruby', 'Go', 'Rust', 'Swift', 'Kotlin'];
+
+                watch(autocompleteInput, (val) => {
+                    const filtered = allSuggestions.filter(s => s.toLowerCase().includes(val.toLowerCase()));
+                    suggestions.value = filtered;
+                    isOpen.value = val.length > 0 && filtered.length > 0;
+                    highlightedIndex.value = -1;
+                    addLog(`Autocomplete: typing="${val}"`);
+                });
+
+                const handleAutocompleteKeydown = (e) => {
+                    if (!isOpen.value) return;
+
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        highlightedIndex.value = Math.min(highlightedIndex.value + 1, suggestions.value.length - 1);
+                        addLog('Autocomplete: ArrowDown');
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        highlightedIndex.value = Math.max(highlightedIndex.value - 1, 0);
+                        addLog('Autocomplete: ArrowUp');
+                    } else if (e.key === 'Enter' && highlightedIndex.value >= 0) {
+                        e.preventDefault();
+                        autocompleteInput.value = suggestions.value[highlightedIndex.value];
+                        isOpen.value = false;
+                        addLog(`Autocomplete: selected="${autocompleteInput.value}"`);
+                    } else if (e.key === 'Escape') {
+                        isOpen.value = false;
+                    }
+                };
+
+                const selectSuggestion = (suggestion) => {
+                    autocompleteInput.value = suggestion;
+                    isOpen.value = false;
+                    addLog(`Autocomplete: clicked="${suggestion}"`);
+                };
+
+                // 9. Tag Input
+                const tagInput = ref('');
+                const tags = ref(['vue', 'javascript']);
+
+                const handleTagKeydown = (e) => {
+                    if (e.key === 'Enter' && tagInput.value.trim()) {
+                        e.preventDefault();
+                        const newTag = tagInput.value.trim().toLowerCase();
+                        if (!tags.value.includes(newTag)) {
+                            tags.value.push(newTag);
+                            addLog(`TagInput: added="${newTag}"`);
+                        }
+                        tagInput.value = '';
+                    } else if (e.key === 'Backspace' && !tagInput.value && tags.value.length) {
+                        const removed = tags.value.pop();
+                        addLog(`TagInput: removed="${removed}"`);
+                    }
+                };
+
+                const removeTag = (tag) => {
+                    const index = tags.value.indexOf(tag);
+                    if (index > -1) {
+                        tags.value.splice(index, 1);
+                        addLog(`TagInput: removed="${tag}"`);
+                    }
+                };
+
+                // 10. Form
+                const formData = reactive({
+                    name: '',
+                    email: '',
+                    message: ''
+                });
+                const submitted = ref(false);
+
+                const handleSubmit = () => {
+                    submitted.value = true;
+                    addLog(`Form submitted: ${JSON.stringify(formData)}`);
+                    setTimeout(() => submitted.value = false, 2000);
+                };
+
+                // 11. Custom v-model component simulation
+                const customValue = ref(50);
+                watch(customValue, (val) => addLog(`CustomSlider: ${val}`));
+
+                return {
+                    logs, logRef, addLog, clearLogs,
+                    basicInput,
+                    trimInput, numberInput, lazyInput,
+                    firstName, lastName, fullName,
+                    textareaValue, maxLength, charCount,
+                    selectedSingle, selectedMultiple,
+                    checkboxes,
+                    radioValue,
+                    autocompleteInput, suggestions, highlightedIndex, isOpen,
+                    handleAutocompleteKeydown, selectSuggestion,
+                    tagInput, tags, handleTagKeydown, removeTag,
+                    formData, submitted, handleSubmit,
+                    customValue
+                };
+            },
+            template: `
+                <section>
+                    <h2>📋 Event Log</h2>
+                    <div ref="logRef" class="event-log">
+                        <div v-for="(log, i) in logs" :key="i">{{ log }}</div>
+                    </div>
+                    <button @click="clearLogs">Clear Log</button>
+                </section>
+
+                <section>
+                    <h2>1. Basic v-model</h2>
+                    <div class="component-row">
+                        <div class="component">
+                            <label>Basic Input (v-model)</label>
+                            <input type="text" v-model="basicInput" placeholder="Type here..." data-testid="basic-input">
+                            <div class="state-display">State: "{{ basicInput }}"</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>2. v-model Modifiers</h2>
+                    <div class="component-row">
+                        <div class="component">
+                            <label>v-model.trim</label>
+                            <input type="text" v-model.trim="trimInput" placeholder="Whitespace trimmed..." data-testid="trim-input">
+                            <div class="state-display">State: "{{ trimInput }}"</div>
+                        </div>
+                        <div class="component">
+                            <label>v-model.number</label>
+                            <input type="number" v-model.number="numberInput" data-testid="number-input">
+                            <div class="state-display">State: {{ numberInput }} ({{ typeof numberInput }})</div>
+                        </div>
+                        <div class="component">
+                            <label>v-model.lazy (updates on change/blur)</label>
+                            <input type="text" v-model.lazy="lazyInput" placeholder="Updates on blur..." data-testid="lazy-input">
+                            <div class="state-display">State: "{{ lazyInput }}"</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>3. Computed v-model (Two-way)</h2>
+                    <div class="component-row">
+                        <div class="component">
+                            <label>First Name</label>
+                            <input type="text" v-model="firstName" placeholder="First name..." data-testid="firstname-input">
+                        </div>
+                        <div class="component">
+                            <label>Last Name</label>
+                            <input type="text" v-model="lastName" placeholder="Last name..." data-testid="lastname-input">
+                        </div>
+                        <div class="component">
+                            <label>Full Name (computed, editable)</label>
+                            <input type="text" v-model="fullName" placeholder="Full name..." data-testid="fullname-input">
+                            <div class="state-display">Computed: "{{ fullName }}"</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>4. Textarea</h2>
+                    <div class="component-row">
+                        <div class="component">
+                            <label>Textarea ({{ charCount }}/{{ maxLength }})</label>
+                            <textarea v-model="textareaValue" :maxlength="maxLength" rows="4" placeholder="Max 200 characters..." data-testid="textarea"></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>5. Select</h2>
+                    <div class="component-row">
+                        <div class="component">
+                            <label>Single Select</label>
+                            <select v-model="selectedSingle" data-testid="select-single">
+                                <option value="">-- Choose --</option>
+                                <option value="vue">Vue</option>
+                                <option value="react">React</option>
+                                <option value="angular">Angular</option>
+                            </select>
+                            <div class="state-display">Selected: "{{ selectedSingle }}"</div>
+                        </div>
+                        <div class="component">
+                            <label>Multiple Select</label>
+                            <select v-model="selectedMultiple" multiple size="4" data-testid="select-multiple">
+                                <option value="red">Red</option>
+                                <option value="green">Green</option>
+                                <option value="blue">Blue</option>
+                            </select>
+                            <div class="state-display">Selected: {{ selectedMultiple }}</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>6. Checkboxes & Radio</h2>
+                    <div class="component-row">
+                        <div class="component">
+                            <label>Checkboxes</label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" v-model="checkboxes.option1" data-testid="checkbox-1"> Option 1
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" v-model="checkboxes.option2" data-testid="checkbox-2"> Option 2
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" v-model="checkboxes.option3" data-testid="checkbox-3"> Option 3
+                            </label>
+                            <div class="state-display">State: {{ checkboxes }}</div>
+                        </div>
+                        <div class="component">
+                            <label>Radio Buttons</label>
+                            <label class="checkbox-label">
+                                <input type="radio" v-model="radioValue" value="small" data-testid="radio-small"> Small
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="radio" v-model="radioValue" value="medium" data-testid="radio-medium"> Medium
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="radio" v-model="radioValue" value="large" data-testid="radio-large"> Large
+                            </label>
+                            <div class="state-display">Selected: "{{ radioValue }}"</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>7. Autocomplete</h2>
+                    <div class="component-row">
+                        <div class="component">
+                            <label>Autocomplete (Arrow Keys + Enter)</label>
+                            <div style="position: relative;">
+                                <input
+                                    type="text"
+                                    v-model="autocompleteInput"
+                                    @keydown="handleAutocompleteKeydown"
+                                    @blur="setTimeout(() => isOpen = false, 200)"
+                                    placeholder="Type a programming language..."
+                                    data-testid="autocomplete-input"
+                                    autocomplete="off"
+                                >
+                                <div v-if="isOpen" class="autocomplete-dropdown">
+                                    <div
+                                        v-for="(s, i) in suggestions"
+                                        :key="s"
+                                        @click="selectSuggestion(s)"
+                                        class="autocomplete-item"
+                                        :class="{ highlighted: i === highlightedIndex }"
+                                        :data-testid="'suggestion-' + i"
+                                    >
+                                        {{ s }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="state-display">Value: "{{ autocompleteInput }}"</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>8. Tag Input</h2>
+                    <div class="component-row">
+                        <div class="component">
+                            <label>Tag Input (Enter to add, Backspace to remove)</label>
+                            <div style="border: 1px solid #ddd; border-radius: 4px; padding: 5px; display: flex; flex-wrap: wrap; gap: 5px;">
+                                <span v-for="tag in tags" :key="tag" class="tag">
+                                    {{ tag }}
+                                    <span @click="removeTag(tag)" style="margin-left: 5px; cursor: pointer;">×</span>
+                                </span>
+                                <input
+                                    type="text"
+                                    v-model="tagInput"
+                                    @keydown="handleTagKeydown"
+                                    placeholder="Add tag..."
+                                    style="border: none; outline: none; flex: 1; min-width: 100px;"
+                                    data-testid="tag-input"
+                                >
+                            </div>
+                            <div class="state-display">Tags: {{ tags }}</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>9. Form</h2>
+                    <div class="component-row">
+                        <div class="component" style="min-width: 100%;">
+                            <label>Form with v-model</label>
+                            <form @submit.prevent="handleSubmit">
+                                <input type="text" v-model="formData.name" placeholder="Name" data-testid="form-name" style="margin-bottom: 10px;">
+                                <input type="email" v-model="formData.email" placeholder="Email" data-testid="form-email" style="margin-bottom: 10px;">
+                                <textarea v-model="formData.message" placeholder="Message" data-testid="form-message" rows="3" style="margin-bottom: 10px;"></textarea>
+                                <button type="submit" data-testid="form-submit">Submit</button>
+                                <span v-if="submitted" class="success" style="margin-left: 10px;">✓ Submitted!</span>
+                            </form>
+                            <div class="state-display">Form State: {{ formData }}</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>10. Range Slider</h2>
+                    <div class="component-row">
+                        <div class="component">
+                            <label>Range: {{ customValue }}</label>
+                            <input type="range" v-model.number="customValue" min="0" max="100" data-testid="range-slider">
+                            <div class="state-display">Value: {{ customValue }}</div>
+                        </div>
+                    </div>
+                </section>
+            `
+        });
+
+        app.mount('#app');
+    </script>
+</body>
+</html>
