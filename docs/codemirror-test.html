@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeMirror Test - 100xBot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material.min.css">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 { margin: 0 0 5px 0; }
+        .subtitle { color: #666; margin-bottom: 20px; }
+        .nav { margin-bottom: 20px; }
+        .nav a { color: #0066cc; text-decoration: none; }
+        .nav a:hover { text-decoration: underline; }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            max-width: 1400px;
+        }
+        .editor-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .editor-section h2 { margin-top: 0; }
+        .CodeMirror {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            height: 400px;
+            font-size: 14px;
+        }
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover { background: #f0f0f0; }
+        select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .log-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: fit-content;
+            max-height: 600px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .log-panel h3 { margin: 0 0 10px 0; }
+        #log {
+            font-family: monospace;
+            font-size: 12px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 10px;
+            border-radius: 4px;
+            height: 500px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .log-entry { margin: 2px 0; }
+        .log-entry.change { color: #4ec9b0; }
+        .log-entry.focus { color: #dcdcaa; }
+        .log-entry.blur { color: #ce9178; }
+        .log-entry.action { color: #569cd6; }
+        .clear-log {
+            margin-top: 10px;
+            width: 100%;
+        }
+        .info {
+            background: #e7f3ff;
+            border: 1px solid #b3d7ff;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+        .options-row {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav"><a href="index.html">&larr; Back to Test Pages</a></div>
+    <h1>CodeMirror Test</h1>
+    <p class="subtitle">Versatile text editor - powers many web-based code editors</p>
+
+    <div class="container">
+        <div class="editor-section">
+            <h2>CodeMirror 5</h2>
+            <div class="info">
+                CodeMirror is a versatile text editor implemented in JavaScript for the browser.
+                It is specialized for editing code, with over 100 language modes available.
+            </div>
+            <div class="options-row">
+                <label>Mode: </label>
+                <select id="mode-select">
+                    <option value="javascript">JavaScript</option>
+                    <option value="htmlmixed">HTML</option>
+                    <option value="css">CSS</option>
+                    <option value="python">Python</option>
+                    <option value="xml">XML</option>
+                    <option value="markdown">Markdown</option>
+                </select>
+                <label style="margin-left: 15px;">Theme: </label>
+                <select id="theme-select">
+                    <option value="default">Default (Light)</option>
+                    <option value="monokai" selected>Monokai</option>
+                    <option value="dracula">Dracula</option>
+                    <option value="material">Material</option>
+                </select>
+            </div>
+            <textarea id="codemirror-textarea"></textarea>
+            <div class="controls">
+                <button onclick="getValue()">Get Value</button>
+                <button onclick="setValue()">Set Value</button>
+                <button onclick="clearEditor()">Clear</button>
+                <button onclick="insertText()">Insert at Cursor</button>
+                <button onclick="selectAll()">Select All</button>
+            </div>
+        </div>
+
+        <div class="log-panel">
+            <h3>Event Log</h3>
+            <div id="log"></div>
+            <button class="clear-log" onclick="clearLog()">Clear Log</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/markdown/markdown.min.js"></script>
+    <script>
+        const logEl = document.getElementById('log');
+        let editor = null;
+
+        function log(message, type = '') {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry ' + type;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logEl.appendChild(entry);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function clearLog() {
+            logEl.innerHTML = '';
+            log('Log cleared', 'action');
+        }
+
+        // Initialize CodeMirror
+        editor = CodeMirror.fromTextArea(document.getElementById('codemirror-textarea'), {
+            mode: 'javascript',
+            theme: 'monokai',
+            lineNumbers: true,
+            indentUnit: 4,
+            tabSize: 4,
+            lineWrapping: true,
+            autofocus: true
+        });
+
+        editor.setValue(`// Welcome to CodeMirror
+function fibonacci(n) {
+    if (n <= 1) return n;
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+// Calculate first 10 fibonacci numbers
+for (let i = 0; i < 10; i++) {
+    console.log(\`fib(\${i}) = \${fibonacci(i)}\`);
+}
+`);
+
+        log('CodeMirror initialized', 'action');
+
+        // Event listeners
+        editor.on('change', (cm, change) => {
+            const text = change.text.join('').substring(0, 30);
+            log(`Change: origin="${change.origin}", text="${text}${text.length >= 30 ? '...' : ''}"`, 'change');
+        });
+
+        editor.on('focus', () => {
+            log('Editor focused', 'focus');
+        });
+
+        editor.on('blur', () => {
+            log('Editor blurred', 'blur');
+        });
+
+        editor.on('cursorActivity', () => {
+            const cursor = editor.getCursor();
+            log(`Cursor: line ${cursor.line + 1}, ch ${cursor.ch}`, 'change');
+        });
+
+        // Mode change
+        document.getElementById('mode-select').addEventListener('change', (e) => {
+            editor.setOption('mode', e.target.value);
+            log(`Mode changed to: ${e.target.value}`, 'action');
+        });
+
+        // Theme change
+        document.getElementById('theme-select').addEventListener('change', (e) => {
+            editor.setOption('theme', e.target.value);
+            log(`Theme changed to: ${e.target.value}`, 'action');
+        });
+
+        function getValue() {
+            const value = editor.getValue();
+            log(`getValue(): ${value.length} chars`, 'action');
+            console.log('CodeMirror value:', value);
+            alert(`Value (${value.length} chars):\n\n${value.substring(0, 500)}${value.length > 500 ? '...' : ''}`);
+        }
+
+        function setValue() {
+            const newValue = `// Value set programmatically at ${new Date().toLocaleTimeString()}
+const greeting = "Hello from setValue!";
+console.log(greeting);
+`;
+            editor.setValue(newValue);
+            log('setValue() called', 'action');
+        }
+
+        function clearEditor() {
+            editor.setValue('');
+            log('Editor cleared', 'action');
+        }
+
+        function insertText() {
+            const text = '/* INSERTED */';
+            editor.replaceSelection(text);
+            log(`Inserted: "${text}"`, 'action');
+        }
+
+        function selectAll() {
+            editor.execCommand('selectAll');
+            log('Select all', 'action');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACE Editor Test - 100xBot</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 { margin: 0 0 5px 0; }
+        .subtitle { color: #666; margin-bottom: 20px; }
+        .nav { margin-bottom: 20px; }
+        .nav a { color: #0066cc; text-decoration: none; }
+        .nav a:hover { text-decoration: underline; }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            max-width: 1400px;
+        }
+        .editor-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .editor-section h2 { margin-top: 0; }
+        #ace-editor {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            height: 400px;
+            font-size: 14px;
+        }
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover { background: #f0f0f0; }
+        select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .log-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: fit-content;
+            max-height: 600px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .log-panel h3 { margin: 0 0 10px 0; }
+        #log {
+            font-family: monospace;
+            font-size: 12px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 10px;
+            border-radius: 4px;
+            height: 500px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .log-entry { margin: 2px 0; }
+        .log-entry.change { color: #4ec9b0; }
+        .log-entry.focus { color: #dcdcaa; }
+        .log-entry.blur { color: #ce9178; }
+        .log-entry.action { color: #569cd6; }
+        .clear-log {
+            margin-top: 10px;
+            width: 100%;
+        }
+        .info {
+            background: #e7f3ff;
+            border: 1px solid #b3d7ff;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+        .options-row {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav"><a href="index.html">&larr; Back to Test Pages</a></div>
+    <h1>ACE Editor Test</h1>
+    <p class="subtitle">High performance code editor - used by Cloud9 IDE</p>
+
+    <div class="container">
+        <div class="editor-section">
+            <h2>ACE Editor</h2>
+            <div class="info">
+                ACE (Ajax.org Cloud9 Editor) is a standalone code editor written in JavaScript.
+                It matches the features of native editors like Sublime Text and TextMate.
+            </div>
+            <div class="options-row">
+                <label>Mode: </label>
+                <select id="mode-select">
+                    <option value="ace/mode/javascript">JavaScript</option>
+                    <option value="ace/mode/html">HTML</option>
+                    <option value="ace/mode/css">CSS</option>
+                    <option value="ace/mode/python">Python</option>
+                    <option value="ace/mode/json">JSON</option>
+                    <option value="ace/mode/typescript">TypeScript</option>
+                    <option value="ace/mode/markdown">Markdown</option>
+                </select>
+                <label style="margin-left: 15px;">Theme: </label>
+                <select id="theme-select">
+                    <option value="ace/theme/chrome">Chrome (Light)</option>
+                    <option value="ace/theme/monokai" selected>Monokai</option>
+                    <option value="ace/theme/twilight">Twilight</option>
+                    <option value="ace/theme/tomorrow_night">Tomorrow Night</option>
+                    <option value="ace/theme/dracula">Dracula</option>
+                </select>
+            </div>
+            <div id="ace-editor"></div>
+            <div class="controls">
+                <button onclick="getValue()">Get Value</button>
+                <button onclick="setValue()">Set Value</button>
+                <button onclick="clearEditor()">Clear</button>
+                <button onclick="insertText()">Insert at Cursor</button>
+                <button onclick="gotoLine()">Go to Line 5</button>
+            </div>
+        </div>
+
+        <div class="log-panel">
+            <h3>Event Log</h3>
+            <div id="log"></div>
+            <button class="clear-log" onclick="clearLog()">Clear Log</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.2/ace.js"></script>
+    <script>
+        const logEl = document.getElementById('log');
+        let editor = null;
+
+        function log(message, type = '') {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry ' + type;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logEl.appendChild(entry);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function clearLog() {
+            logEl.innerHTML = '';
+            log('Log cleared', 'action');
+        }
+
+        // Initialize ACE
+        editor = ace.edit('ace-editor');
+        editor.setTheme('ace/theme/monokai');
+        editor.session.setMode('ace/mode/javascript');
+        editor.setOptions({
+            fontSize: '14px',
+            showPrintMargin: false,
+            tabSize: 4,
+            useSoftTabs: true
+        });
+
+        editor.setValue(`// Welcome to ACE Editor
+class Calculator {
+    constructor() {
+        this.result = 0;
+    }
+
+    add(n) {
+        this.result += n;
+        return this;
+    }
+
+    subtract(n) {
+        this.result -= n;
+        return this;
+    }
+
+    getResult() {
+        return this.result;
+    }
+}
+
+const calc = new Calculator();
+console.log(calc.add(10).subtract(3).getResult()); // 7
+`, -1);
+
+        log('ACE editor initialized', 'action');
+
+        // Event listeners
+        editor.session.on('change', (delta) => {
+            const action = delta.action;
+            const text = delta.lines.join('').substring(0, 30);
+            log(`Change: action="${action}", text="${text}${text.length >= 30 ? '...' : ''}"`, 'change');
+        });
+
+        editor.on('focus', () => {
+            log('Editor focused', 'focus');
+        });
+
+        editor.on('blur', () => {
+            log('Editor blurred', 'blur');
+        });
+
+        editor.selection.on('changeCursor', () => {
+            const pos = editor.getCursorPosition();
+            log(`Cursor: row ${pos.row + 1}, col ${pos.column}`, 'change');
+        });
+
+        // Mode change
+        document.getElementById('mode-select').addEventListener('change', (e) => {
+            editor.session.setMode(e.target.value);
+            const modeName = e.target.value.split('/').pop();
+            log(`Mode changed to: ${modeName}`, 'action');
+        });
+
+        // Theme change
+        document.getElementById('theme-select').addEventListener('change', (e) => {
+            editor.setTheme(e.target.value);
+            const themeName = e.target.value.split('/').pop();
+            log(`Theme changed to: ${themeName}`, 'action');
+        });
+
+        function getValue() {
+            const value = editor.getValue();
+            log(`getValue(): ${value.length} chars`, 'action');
+            console.log('ACE value:', value);
+            alert(`Value (${value.length} chars):\n\n${value.substring(0, 500)}${value.length > 500 ? '...' : ''}`);
+        }
+
+        function setValue() {
+            const newValue = `// Value set programmatically at ${new Date().toLocaleTimeString()}
+const message = "Hello from ACE setValue!";
+console.log(message);
+`;
+            editor.setValue(newValue, -1);
+            log('setValue() called', 'action');
+        }
+
+        function clearEditor() {
+            editor.setValue('', -1);
+            log('Editor cleared', 'action');
+        }
+
+        function insertText() {
+            const text = '/* INSERTED */';
+            editor.insert(text);
+            log(`Inserted: "${text}"`, 'action');
+        }
+
+        function gotoLine() {
+            editor.gotoLine(5, 0, true);
+            log('Navigated to line 5', 'action');
+        }
+    </script>
+</body>
+</html>

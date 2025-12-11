@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monaco Editor Test - 100xBot</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 { margin: 0 0 5px 0; }
+        .subtitle { color: #666; margin-bottom: 20px; }
+        .nav { margin-bottom: 20px; }
+        .nav a { color: #0066cc; text-decoration: none; }
+        .nav a:hover { text-decoration: underline; }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            max-width: 1400px;
+        }
+        .editor-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .editor-section h2 { margin-top: 0; }
+        .editor-wrapper {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            height: 400px;
+        }
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover { background: #f0f0f0; }
+        select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .log-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: fit-content;
+            max-height: 600px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .log-panel h3 { margin: 0 0 10px 0; }
+        #log {
+            font-family: monospace;
+            font-size: 12px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 10px;
+            border-radius: 4px;
+            height: 500px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .log-entry { margin: 2px 0; }
+        .log-entry.change { color: #4ec9b0; }
+        .log-entry.focus { color: #dcdcaa; }
+        .log-entry.blur { color: #ce9178; }
+        .log-entry.action { color: #569cd6; }
+        .clear-log {
+            margin-top: 10px;
+            width: 100%;
+        }
+        .info {
+            background: #e7f3ff;
+            border: 1px solid #b3d7ff;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav"><a href="index.html">&larr; Back to Test Pages</a></div>
+    <h1>Monaco Editor Test</h1>
+    <p class="subtitle">VS Code's editor component - supports syntax highlighting, autocomplete, and more</p>
+
+    <div class="container">
+        <div class="editor-section">
+            <h2>Monaco Editor</h2>
+            <div class="info">
+                Monaco is the editor that powers VS Code. It provides rich IntelliSense,
+                validation, and syntax highlighting for many languages.
+            </div>
+            <div>
+                <label>Language: </label>
+                <select id="language-select">
+                    <option value="javascript">JavaScript</option>
+                    <option value="typescript">TypeScript</option>
+                    <option value="html">HTML</option>
+                    <option value="css">CSS</option>
+                    <option value="json">JSON</option>
+                    <option value="python">Python</option>
+                    <option value="markdown">Markdown</option>
+                </select>
+                <label style="margin-left: 15px;">Theme: </label>
+                <select id="theme-select">
+                    <option value="vs">Light (vs)</option>
+                    <option value="vs-dark" selected>Dark (vs-dark)</option>
+                    <option value="hc-black">High Contrast</option>
+                </select>
+            </div>
+            <div id="monaco-container" class="editor-wrapper" style="margin-top: 15px;"></div>
+            <div class="controls">
+                <button onclick="getValue()">Get Value</button>
+                <button onclick="setValue()">Set Value</button>
+                <button onclick="clearEditor()">Clear</button>
+                <button onclick="insertText()">Insert at Cursor</button>
+                <button onclick="formatDocument()">Format</button>
+            </div>
+        </div>
+
+        <div class="log-panel">
+            <h3>Event Log</h3>
+            <div id="log"></div>
+            <button class="clear-log" onclick="clearLog()">Clear Log</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+    <script>
+        let editor = null;
+        const logEl = document.getElementById('log');
+
+        function log(message, type = '') {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry ' + type;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logEl.appendChild(entry);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function clearLog() {
+            logEl.innerHTML = '';
+            log('Log cleared', 'action');
+        }
+
+        // Initialize Monaco
+        require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' } });
+
+        require(['vs/editor/editor.main'], function () {
+            log('Monaco loader ready', 'action');
+
+            editor = monaco.editor.create(document.getElementById('monaco-container'), {
+                value: `// Welcome to Monaco Editor
+function greet(name) {
+    return \`Hello, \${name}!\`;
+}
+
+// Try typing - you'll get autocomplete
+console.log(greet("World"));
+
+// Change language and theme using the dropdowns above
+`,
+                language: 'javascript',
+                theme: 'vs-dark',
+                automaticLayout: true,
+                minimap: { enabled: true },
+                fontSize: 14,
+                lineNumbers: 'on',
+                scrollBeyondLastLine: false
+            });
+
+            log('Monaco editor initialized', 'action');
+
+            // Event listeners
+            editor.onDidChangeModelContent((e) => {
+                const changes = e.changes.map(c => c.text.substring(0, 50)).join(', ');
+                log(`Content changed: "${changes}${changes.length >= 50 ? '...' : ''}"`, 'change');
+            });
+
+            editor.onDidFocusEditorText(() => {
+                log('Editor focused', 'focus');
+            });
+
+            editor.onDidBlurEditorText(() => {
+                log('Editor blurred', 'blur');
+            });
+
+            editor.onDidChangeCursorPosition((e) => {
+                log(`Cursor: line ${e.position.lineNumber}, col ${e.position.column}`, 'change');
+            });
+
+            // Language change
+            document.getElementById('language-select').addEventListener('change', (e) => {
+                monaco.editor.setModelLanguage(editor.getModel(), e.target.value);
+                log(`Language changed to: ${e.target.value}`, 'action');
+            });
+
+            // Theme change
+            document.getElementById('theme-select').addEventListener('change', (e) => {
+                monaco.editor.setTheme(e.target.value);
+                log(`Theme changed to: ${e.target.value}`, 'action');
+            });
+        });
+
+        function getValue() {
+            if (!editor) return;
+            const value = editor.getValue();
+            log(`getValue(): ${value.length} chars`, 'action');
+            console.log('Monaco value:', value);
+            alert(`Value (${value.length} chars):\n\n${value.substring(0, 500)}${value.length > 500 ? '...' : ''}`);
+        }
+
+        function setValue() {
+            if (!editor) return;
+            const newValue = `// Value set programmatically at ${new Date().toLocaleTimeString()}
+const message = "Hello from setValue!";
+console.log(message);
+`;
+            editor.setValue(newValue);
+            log('setValue() called', 'action');
+        }
+
+        function clearEditor() {
+            if (!editor) return;
+            editor.setValue('');
+            log('Editor cleared', 'action');
+        }
+
+        function insertText() {
+            if (!editor) return;
+            const text = '/* INSERTED TEXT */';
+            editor.trigger('keyboard', 'type', { text });
+            log(`Inserted: "${text}"`, 'action');
+        }
+
+        function formatDocument() {
+            if (!editor) return;
+            editor.getAction('editor.action.formatDocument').run();
+            log('Format document triggered', 'action');
+        }
+    </script>
+</body>
+</html>
