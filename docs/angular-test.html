@@ -1,16 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="testApp">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Angular Components Test - 100xBot</title>
-    <script src="https://unpkg.com/zone.js@0.14.0/dist/zone.min.js"></script>
-    <script src="https://unpkg.com/@angular/core@17.0.0/bundles/core.umd.js"></script>
-    <script src="https://unpkg.com/@angular/common@17.0.0/bundles/common.umd.js"></script>
-    <script src="https://unpkg.com/@angular/compiler@17.0.0/bundles/compiler.umd.js"></script>
-    <script src="https://unpkg.com/@angular/platform-browser@17.0.0/bundles/platform-browser.umd.js"></script>
-    <script src="https://unpkg.com/@angular/platform-browser-dynamic@17.0.0/bundles/platform-browser-dynamic.umd.js"></script>
-    <script src="https://unpkg.com/@angular/forms@17.0.0/bundles/forms.umd.js"></script>
+    <title>AngularJS Components Test - 100xBot</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -68,6 +62,7 @@
             color: white;
         }
         button:hover { background: #c3002f; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
         .event-log {
             background: #1e1e1e;
             color: #dd0031;
@@ -102,323 +97,393 @@
             border-color: #ff6b6b;
         }
         .info-box {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
             border-radius: 4px;
             padding: 15px;
             margin-bottom: 20px;
         }
     </style>
 </head>
-<body>
-    <h1>🅰️ Angular Components Test Page</h1>
-    <p>Test page for Angular reactive forms and template-driven forms.</p>
+<body ng-controller="MainController">
+    <h1>AngularJS Components Test Page</h1>
+    <p>Test page for AngularJS two-way data binding with ng-model.</p>
 
     <div class="info-box">
-        <strong>Note:</strong> This page uses standalone Angular components loaded via UMD bundles.
-        Due to Angular's architecture, some advanced features require a full build setup.
-        This page demonstrates the core form binding patterns.
+        <strong>Note:</strong> This page uses AngularJS 1.8 (the classic Angular).
+        Angular 2+ requires a build step and cannot be loaded via CDN.
+        The ng-model patterns here are similar to modern Angular's template-driven forms.
     </div>
 
-    <app-root></app-root>
+    <!-- Event Log -->
+    <section>
+        <h2>Event Log</h2>
+        <div class="event-log">
+            <div ng-repeat="log in logs track by $index">{{log}}</div>
+        </div>
+        <button ng-click="clearLogs()">Clear Log</button>
+    </section>
+
+    <!-- Basic ng-model -->
+    <section>
+        <h2>1. Basic ng-model Binding</h2>
+        <div class="component-row">
+            <div class="component">
+                <label>Text Input</label>
+                <input type="text"
+                       ng-model="basicValue"
+                       ng-change="onBasicChange()"
+                       placeholder="Type here..."
+                       data-testid="ngmodel-basic">
+                <div class="state-display">State: "{{basicValue}}"</div>
+            </div>
+            <div class="component">
+                <label>With ng-trim (default: true)</label>
+                <input type="text"
+                       ng-model="trimmedValue"
+                       ng-change="onTrimChange()"
+                       placeholder="Whitespace trimmed..."
+                       data-testid="ngmodel-trim">
+                <div class="state-display">State: "{{trimmedValue}}"</div>
+            </div>
+            <div class="component">
+                <label>ng-trim="false"</label>
+                <input type="text"
+                       ng-model="untrimmedValue"
+                       ng-trim="false"
+                       ng-change="onUntrimChange()"
+                       placeholder="Preserves whitespace..."
+                       data-testid="ngmodel-notrim">
+                <div class="state-display">State: "{{untrimmedValue}}" (length: {{untrimmedValue.length}})</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Validation -->
+    <section>
+        <h2>2. Form Validation</h2>
+        <form name="validationForm" novalidate>
+            <div class="component-row">
+                <div class="component">
+                    <label>Required Field</label>
+                    <input type="text"
+                           name="requiredField"
+                           ng-model="requiredValue"
+                           ng-change="onRequiredChange()"
+                           required
+                           ng-minlength="3"
+                           placeholder="Min 3 characters..."
+                           data-testid="ngmodel-required">
+                    <div class="error" ng-show="validationForm.requiredField.$touched && validationForm.requiredField.$invalid">
+                        <span ng-show="validationForm.requiredField.$error.required">Required</span>
+                        <span ng-show="validationForm.requiredField.$error.minlength">Min 3 characters</span>
+                    </div>
+                    <div class="state-display">Valid: {{validationForm.requiredField.$valid}}</div>
+                </div>
+                <div class="component">
+                    <label>Email Validation</label>
+                    <input type="email"
+                           name="emailField"
+                           ng-model="emailValue"
+                           ng-change="onEmailChange()"
+                           required
+                           placeholder="email@example.com"
+                           data-testid="ngmodel-email">
+                    <div class="error" ng-show="validationForm.emailField.$touched && validationForm.emailField.$invalid">
+                        <span ng-show="validationForm.emailField.$error.required">Required</span>
+                        <span ng-show="validationForm.emailField.$error.email">Invalid email</span>
+                    </div>
+                    <div class="state-display">Valid: {{validationForm.emailField.$valid}}</div>
+                </div>
+                <div class="component">
+                    <label>Pattern (alphanumeric only)</label>
+                    <input type="text"
+                           name="patternField"
+                           ng-model="patternValue"
+                           ng-change="onPatternChange()"
+                           ng-pattern="/^[a-zA-Z0-9]+$/"
+                           placeholder="Letters and numbers..."
+                           data-testid="ngmodel-pattern">
+                    <div class="error" ng-show="validationForm.patternField.$touched && validationForm.patternField.$error.pattern">
+                        Alphanumeric characters only
+                    </div>
+                    <div class="state-display">Valid: {{validationForm.patternField.$valid}}</div>
+                </div>
+            </div>
+        </form>
+    </section>
+
+    <!-- Textarea & Select -->
+    <section>
+        <h2>3. Textarea & Select</h2>
+        <div class="component-row">
+            <div class="component">
+                <label>Textarea ({{textareaValue.length}}/200)</label>
+                <textarea ng-model="textareaValue"
+                          ng-change="onTextareaChange()"
+                          ng-maxlength="200"
+                          rows="4"
+                          placeholder="Enter text..."
+                          data-testid="ngmodel-textarea"></textarea>
+            </div>
+            <div class="component">
+                <label>Select</label>
+                <select ng-model="selectedValue"
+                        ng-change="onSelectChange()"
+                        data-testid="ngmodel-select">
+                    <option value="">-- Choose --</option>
+                    <option value="angular">Angular</option>
+                    <option value="react">React</option>
+                    <option value="vue">Vue</option>
+                </select>
+                <div class="state-display">Selected: "{{selectedValue}}"</div>
+            </div>
+            <div class="component">
+                <label>Select with ng-options</label>
+                <select ng-model="selectedFramework"
+                        ng-options="f.value as f.label for f in frameworks"
+                        ng-change="onFrameworkChange()"
+                        data-testid="ngmodel-ngoptions">
+                    <option value="">-- Choose Framework --</option>
+                </select>
+                <div class="state-display">Selected: "{{selectedFramework}}"</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Checkboxes & Radio -->
+    <section>
+        <h2>4. Checkboxes & Radio Buttons</h2>
+        <div class="component-row">
+            <div class="component">
+                <label>Checkboxes</label>
+                <label class="checkbox-label">
+                    <input type="checkbox"
+                           ng-model="checkboxes.option1"
+                           ng-change="onCheckboxChange('option1')"
+                           data-testid="checkbox-1"> Option 1
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox"
+                           ng-model="checkboxes.option2"
+                           ng-change="onCheckboxChange('option2')"
+                           data-testid="checkbox-2"> Option 2
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox"
+                           ng-model="checkboxes.option3"
+                           ng-change="onCheckboxChange('option3')"
+                           data-testid="checkbox-3"> Option 3
+                </label>
+                <div class="state-display">State: {{checkboxes | json}}</div>
+            </div>
+            <div class="component">
+                <label>Radio Buttons</label>
+                <label class="checkbox-label">
+                    <input type="radio"
+                           ng-model="radioValue"
+                           value="small"
+                           ng-change="onRadioChange()"
+                           data-testid="radio-small"> Small
+                </label>
+                <label class="checkbox-label">
+                    <input type="radio"
+                           ng-model="radioValue"
+                           value="medium"
+                           ng-change="onRadioChange()"
+                           data-testid="radio-medium"> Medium
+                </label>
+                <label class="checkbox-label">
+                    <input type="radio"
+                           ng-model="radioValue"
+                           value="large"
+                           ng-change="onRadioChange()"
+                           data-testid="radio-large"> Large
+                </label>
+                <div class="state-display">Selected: "{{radioValue}}"</div>
+            </div>
+            <div class="component">
+                <label>Checkbox with ng-true-value/ng-false-value</label>
+                <label class="checkbox-label">
+                    <input type="checkbox"
+                           ng-model="customCheckbox"
+                           ng-true-value="'YES'"
+                           ng-false-value="'NO'"
+                           ng-change="onCustomCheckboxChange()"
+                           data-testid="checkbox-custom"> Agree to terms
+                </label>
+                <div class="state-display">Value: "{{customCheckbox}}"</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Number & Range -->
+    <section>
+        <h2>5. Number & Range</h2>
+        <div class="component-row">
+            <div class="component">
+                <label>Number Input</label>
+                <input type="number"
+                       ng-model="numberValue"
+                       ng-change="onNumberChange()"
+                       min="0"
+                       max="100"
+                       data-testid="number-input">
+                <div class="state-display">Value: {{numberValue}} (type: {{getType(numberValue)}})</div>
+            </div>
+            <div class="component">
+                <label>Range: {{rangeValue}}</label>
+                <input type="range"
+                       ng-model="rangeValue"
+                       ng-change="onRangeChange()"
+                       min="0"
+                       max="100"
+                       data-testid="range-input">
+                <div class="state-display">Value: {{rangeValue}}</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Form Submit -->
+    <section>
+        <h2>6. Form Submit</h2>
+        <form name="submitForm" ng-submit="onSubmit()" novalidate>
+            <div class="component-row">
+                <div class="component">
+                    <label>First Name</label>
+                    <input type="text"
+                           name="firstName"
+                           ng-model="formData.firstName"
+                           required
+                           placeholder="First name..."
+                           data-testid="form-firstname">
+                </div>
+                <div class="component">
+                    <label>Last Name</label>
+                    <input type="text"
+                           name="lastName"
+                           ng-model="formData.lastName"
+                           required
+                           placeholder="Last name..."
+                           data-testid="form-lastname">
+                </div>
+                <div class="component">
+                    <label>Email</label>
+                    <input type="email"
+                           name="email"
+                           ng-model="formData.email"
+                           required
+                           placeholder="Email..."
+                           data-testid="form-email">
+                </div>
+            </div>
+            <button type="submit" ng-disabled="submitForm.$invalid" data-testid="form-submit">Submit</button>
+            <span class="success" ng-show="formSubmitted" style="margin-left: 10px;">Submitted!</span>
+            <div class="state-display">Form Data: {{formData | json}}</div>
+            <div class="state-display">Form Valid: {{submitForm.$valid}}</div>
+        </form>
+    </section>
+
+    <!-- ng-model-options -->
+    <section>
+        <h2>7. ng-model-options</h2>
+        <div class="component-row">
+            <div class="component">
+                <label>Debounce (500ms)</label>
+                <input type="text"
+                       ng-model="debounceValue"
+                       ng-model-options="{ debounce: 500 }"
+                       ng-change="onDebounceChange()"
+                       placeholder="Updates after 500ms..."
+                       data-testid="ngmodel-debounce">
+                <div class="state-display">Debounced: "{{debounceValue}}"</div>
+            </div>
+            <div class="component">
+                <label>Update on blur</label>
+                <input type="text"
+                       ng-model="blurValue"
+                       ng-model-options="{ updateOn: 'blur' }"
+                       ng-change="onBlurChange()"
+                       placeholder="Updates on blur..."
+                       data-testid="ngmodel-blur">
+                <div class="state-display">Value: "{{blurValue}}"</div>
+            </div>
+        </div>
+    </section>
 
     <script>
-        // Angular UMD globals
-        const { Component, NgModule, enableProdMode, Input, Output, EventEmitter } = ng.core;
-        const { BrowserModule } = ng.platformBrowser;
-        const { platformBrowserDynamic } = ng.platformBrowserDynamic;
-        const { FormsModule, ReactiveFormsModule, FormControl, FormGroup, Validators } = ng.forms;
-        const { CommonModule } = ng.common;
+        angular.module('testApp', [])
+            .controller('MainController', ['$scope', function($scope) {
+                // Event log
+                $scope.logs = [];
+                const addLog = (message) => {
+                    const time = new Date().toLocaleTimeString();
+                    $scope.logs.push(`[${time}] ${message}`);
+                    setTimeout(() => {
+                        const logEl = document.querySelector('.event-log');
+                        if (logEl) logEl.scrollTop = logEl.scrollHeight;
+                    }, 0);
+                };
 
-        // Event Log Service (simple implementation)
-        const logs = [];
-        const addLog = (message) => {
-            const time = new Date().toLocaleTimeString();
-            logs.push(`[${time}] ${message}`);
-            // Update log display
-            setTimeout(() => {
-                const logEl = document.querySelector('.event-log');
-                if (logEl) {
-                    logEl.innerHTML = logs.map(l => `<div>${l}</div>`).join('');
-                    logEl.scrollTop = logEl.scrollHeight;
-                }
-            }, 0);
-        };
+                $scope.clearLogs = () => { $scope.logs = []; };
 
-        // Main App Component
-        const AppComponent = Component({
-            selector: 'app-root',
-            template: `
-                <section>
-                    <h2>📋 Event Log</h2>
-                    <div class="event-log"></div>
-                    <button (click)="clearLogs()">Clear Log</button>
-                </section>
+                // Basic values
+                $scope.basicValue = '';
+                $scope.trimmedValue = '';
+                $scope.untrimmedValue = '';
+                $scope.requiredValue = '';
+                $scope.emailValue = '';
+                $scope.patternValue = '';
+                $scope.textareaValue = '';
+                $scope.selectedValue = '';
+                $scope.selectedFramework = '';
+                $scope.radioValue = 'medium';
+                $scope.customCheckbox = 'NO';
+                $scope.numberValue = 50;
+                $scope.rangeValue = 50;
+                $scope.debounceValue = '';
+                $scope.blurValue = '';
 
-                <section>
-                    <h2>1. Template-Driven Forms (ngModel)</h2>
-                    <div class="component-row">
-                        <div class="component">
-                            <label>Basic ngModel</label>
-                            <input type="text"
-                                   [(ngModel)]="basicValue"
-                                   (ngModelChange)="onBasicChange($event)"
-                                   placeholder="Type here..."
-                                   data-testid="ngmodel-basic">
-                            <div class="state-display">State: "{{basicValue}}"</div>
-                        </div>
-                        <div class="component">
-                            <label>ngModel with Required</label>
-                            <input type="text"
-                                   [(ngModel)]="requiredValue"
-                                   #requiredInput="ngModel"
-                                   required
-                                   minlength="3"
-                                   (ngModelChange)="onRequiredChange($event)"
-                                   placeholder="Min 3 characters..."
-                                   data-testid="ngmodel-required">
-                            <div *ngIf="requiredInput.invalid && requiredInput.touched" class="error">
-                                <span *ngIf="requiredInput.errors?.['required']">Required</span>
-                                <span *ngIf="requiredInput.errors?.['minlength']">Min 3 characters</span>
-                            </div>
-                            <div class="state-display">Valid: {{requiredInput.valid}}</div>
-                        </div>
-                    </div>
-                </section>
+                $scope.checkboxes = { option1: false, option2: true, option3: false };
 
-                <section>
-                    <h2>2. Textarea & Select</h2>
-                    <div class="component-row">
-                        <div class="component">
-                            <label>Textarea ({{textareaValue.length}}/200)</label>
-                            <textarea [(ngModel)]="textareaValue"
-                                      (ngModelChange)="onTextareaChange($event)"
-                                      maxlength="200"
-                                      rows="4"
-                                      placeholder="Enter text..."
-                                      data-testid="ngmodel-textarea"></textarea>
-                        </div>
-                        <div class="component">
-                            <label>Select</label>
-                            <select [(ngModel)]="selectedValue"
-                                    (ngModelChange)="onSelectChange($event)"
-                                    data-testid="ngmodel-select">
-                                <option value="">-- Choose --</option>
-                                <option value="angular">Angular</option>
-                                <option value="react">React</option>
-                                <option value="vue">Vue</option>
-                            </select>
-                            <div class="state-display">Selected: "{{selectedValue}}"</div>
-                        </div>
-                    </div>
-                </section>
+                $scope.frameworks = [
+                    { value: 'angular', label: 'Angular' },
+                    { value: 'react', label: 'React' },
+                    { value: 'vue', label: 'Vue' },
+                    { value: 'svelte', label: 'Svelte' }
+                ];
 
-                <section>
-                    <h2>3. Checkboxes & Radio</h2>
-                    <div class="component-row">
-                        <div class="component">
-                            <label>Checkboxes</label>
-                            <label class="checkbox-label">
-                                <input type="checkbox"
-                                       [(ngModel)]="checkboxes.option1"
-                                       (ngModelChange)="onCheckboxChange('option1', $event)"
-                                       data-testid="checkbox-1"> Option 1
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox"
-                                       [(ngModel)]="checkboxes.option2"
-                                       (ngModelChange)="onCheckboxChange('option2', $event)"
-                                       data-testid="checkbox-2"> Option 2
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox"
-                                       [(ngModel)]="checkboxes.option3"
-                                       (ngModelChange)="onCheckboxChange('option3', $event)"
-                                       data-testid="checkbox-3"> Option 3
-                            </label>
-                            <div class="state-display">State: {{checkboxes | json}}</div>
-                        </div>
-                        <div class="component">
-                            <label>Radio Buttons</label>
-                            <label class="checkbox-label">
-                                <input type="radio"
-                                       [(ngModel)]="radioValue"
-                                       value="small"
-                                       (ngModelChange)="onRadioChange($event)"
-                                       data-testid="radio-small"> Small
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="radio"
-                                       [(ngModel)]="radioValue"
-                                       value="medium"
-                                       (ngModelChange)="onRadioChange($event)"
-                                       data-testid="radio-medium"> Medium
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="radio"
-                                       [(ngModel)]="radioValue"
-                                       value="large"
-                                       (ngModelChange)="onRadioChange($event)"
-                                       data-testid="radio-large"> Large
-                            </label>
-                            <div class="state-display">Selected: "{{radioValue}}"</div>
-                        </div>
-                    </div>
-                </section>
+                $scope.formData = { firstName: '', lastName: '', email: '' };
+                $scope.formSubmitted = false;
 
-                <section>
-                    <h2>4. Reactive Forms (FormControl)</h2>
-                    <div class="component-row">
-                        <div class="component">
-                            <label>FormControl</label>
-                            <input type="text"
-                                   [formControl]="nameControl"
-                                   placeholder="Type here..."
-                                   data-testid="formcontrol-input">
-                            <div class="state-display">Value: "{{nameControl.value}}"</div>
-                        </div>
-                        <div class="component">
-                            <label>FormControl with Validation</label>
-                            <input type="email"
-                                   [formControl]="emailControl"
-                                   placeholder="Email..."
-                                   data-testid="formcontrol-email">
-                            <div *ngIf="emailControl.invalid && emailControl.touched" class="error">
-                                <span *ngIf="emailControl.errors?.['required']">Required</span>
-                                <span *ngIf="emailControl.errors?.['email']">Invalid email</span>
-                            </div>
-                            <div class="state-display">Valid: {{emailControl.valid}}</div>
-                        </div>
-                    </div>
-                </section>
+                // Event handlers
+                $scope.onBasicChange = () => addLog(`BasicInput: "${$scope.basicValue}"`);
+                $scope.onTrimChange = () => addLog(`TrimInput: "${$scope.trimmedValue}"`);
+                $scope.onUntrimChange = () => addLog(`NoTrimInput: "${$scope.untrimmedValue}"`);
+                $scope.onRequiredChange = () => addLog(`RequiredInput: "${$scope.requiredValue}"`);
+                $scope.onEmailChange = () => addLog(`EmailInput: "${$scope.emailValue}"`);
+                $scope.onPatternChange = () => addLog(`PatternInput: "${$scope.patternValue}"`);
+                $scope.onTextareaChange = () => addLog(`Textarea: ${$scope.textareaValue.length} chars`);
+                $scope.onSelectChange = () => addLog(`Select: "${$scope.selectedValue}"`);
+                $scope.onFrameworkChange = () => addLog(`Framework: "${$scope.selectedFramework}"`);
+                $scope.onCheckboxChange = (key) => addLog(`Checkbox ${key}: ${$scope.checkboxes[key]}`);
+                $scope.onRadioChange = () => addLog(`Radio: "${$scope.radioValue}"`);
+                $scope.onCustomCheckboxChange = () => addLog(`CustomCheckbox: "${$scope.customCheckbox}"`);
+                $scope.onNumberChange = () => addLog(`Number: ${$scope.numberValue}`);
+                $scope.onRangeChange = () => addLog(`Range: ${$scope.rangeValue}`);
+                $scope.onDebounceChange = () => addLog(`Debounce: "${$scope.debounceValue}"`);
+                $scope.onBlurChange = () => addLog(`BlurInput: "${$scope.blurValue}"`);
 
-                <section>
-                    <h2>5. Reactive Form Group</h2>
-                    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
-                        <div class="component-row">
-                            <div class="component">
-                                <label>First Name</label>
-                                <input type="text"
-                                       formControlName="firstName"
-                                       placeholder="First name..."
-                                       data-testid="form-firstname">
-                            </div>
-                            <div class="component">
-                                <label>Last Name</label>
-                                <input type="text"
-                                       formControlName="lastName"
-                                       placeholder="Last name..."
-                                       data-testid="form-lastname">
-                            </div>
-                        </div>
-                        <div class="component-row">
-                            <div class="component">
-                                <label>Email</label>
-                                <input type="email"
-                                       formControlName="email"
-                                       placeholder="Email..."
-                                       data-testid="form-email">
-                            </div>
-                        </div>
-                        <button type="submit" [disabled]="profileForm.invalid" data-testid="form-submit">Submit</button>
-                        <span *ngIf="formSubmitted" class="success" style="margin-left: 10px;">✓ Submitted!</span>
-                        <div class="state-display">Form Value: {{profileForm.value | json}}</div>
-                    </form>
-                </section>
+                $scope.onSubmit = () => {
+                    $scope.formSubmitted = true;
+                    addLog(`Form submitted: ${JSON.stringify($scope.formData)}`);
+                    setTimeout(() => { $scope.$apply(() => { $scope.formSubmitted = false; }); }, 2000);
+                };
 
-                <section>
-                    <h2>6. Number & Range</h2>
-                    <div class="component-row">
-                        <div class="component">
-                            <label>Number Input</label>
-                            <input type="number"
-                                   [(ngModel)]="numberValue"
-                                   (ngModelChange)="onNumberChange($event)"
-                                   min="0"
-                                   max="100"
-                                   data-testid="number-input">
-                            <div class="state-display">Value: {{numberValue}}</div>
-                        </div>
-                        <div class="component">
-                            <label>Range: {{rangeValue}}</label>
-                            <input type="range"
-                                   [(ngModel)]="rangeValue"
-                                   (ngModelChange)="onRangeChange($event)"
-                                   min="0"
-                                   max="100"
-                                   data-testid="range-input">
-                            <div class="state-display">Value: {{rangeValue}}</div>
-                        </div>
-                    </div>
-                </section>
-            `
-        }).Class({
-            constructor: function() {
-                // Template-driven form values
-                this.basicValue = '';
-                this.requiredValue = '';
-                this.textareaValue = '';
-                this.selectedValue = '';
-                this.checkboxes = { option1: false, option2: true, option3: false };
-                this.radioValue = 'medium';
-                this.numberValue = 50;
-                this.rangeValue = 50;
+                $scope.getType = (val) => typeof val;
 
-                // Reactive form controls
-                this.nameControl = new FormControl('');
-                this.emailControl = new FormControl('', [Validators.required, Validators.email]);
-
-                // Reactive form group
-                this.profileForm = new FormGroup({
-                    firstName: new FormControl('', Validators.required),
-                    lastName: new FormControl('', Validators.required),
-                    email: new FormControl('', [Validators.required, Validators.email])
-                });
-
-                this.formSubmitted = false;
-
-                // Subscribe to reactive form changes
-                this.nameControl.valueChanges.subscribe(val => addLog(`FormControl: "${val}"`));
-                this.emailControl.valueChanges.subscribe(val => addLog(`EmailControl: "${val}"`));
-                this.profileForm.valueChanges.subscribe(val => addLog(`FormGroup: ${JSON.stringify(val)}`));
-
-                addLog('Angular test page loaded');
-            },
-
-            // Event handlers
-            onBasicChange: function(value) { addLog(`BasicInput: "${value}"`); },
-            onRequiredChange: function(value) { addLog(`RequiredInput: "${value}"`); },
-            onTextareaChange: function(value) { addLog(`Textarea: ${value.length} chars`); },
-            onSelectChange: function(value) { addLog(`Select: "${value}"`); },
-            onCheckboxChange: function(key, value) { addLog(`Checkbox ${key}: ${value}`); },
-            onRadioChange: function(value) { addLog(`Radio: "${value}"`); },
-            onNumberChange: function(value) { addLog(`Number: ${value}`); },
-            onRangeChange: function(value) { addLog(`Range: ${value}`); },
-
-            onSubmit: function() {
-                this.formSubmitted = true;
-                addLog(`Form submitted: ${JSON.stringify(this.profileForm.value)}`);
-                setTimeout(() => this.formSubmitted = false, 2000);
-            },
-
-            clearLogs: function() {
-                logs.length = 0;
-                const logEl = document.querySelector('.event-log');
-                if (logEl) logEl.innerHTML = '';
-            }
-        });
-
-        // App Module
-        const AppModule = NgModule({
-            imports: [BrowserModule, FormsModule, ReactiveFormsModule, CommonModule],
-            declarations: [AppComponent],
-            bootstrap: [AppComponent]
-        }).Class({
-            constructor: function() {}
-        });
-
-        // Bootstrap
-        platformBrowserDynamic().bootstrapModule(AppModule);
+                addLog('AngularJS test page loaded');
+            }]);
     </script>
 </body>
 </html>
