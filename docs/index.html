@@ -3,158 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>100xBot - Test Pages</title>
+    <title>100xBot Test Pages</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        .container {
-            background: white;
-            border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        h1 {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
             color: #333;
-            margin-bottom: 10px;
         }
-        .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-        }
-        h2 {
-            color: #555;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #eee;
-        }
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 15px;
-        }
-        .card {
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 20px;
-            transition: all 0.2s;
-        }
-        .card:hover {
-            border-color: #667eea;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-            transform: translateY(-2px);
-        }
-        .card h3 {
-            margin: 0 0 8px 0;
-            color: #333;
-            font-size: 16px;
-        }
-        .card p {
-            margin: 0 0 15px 0;
-            color: #666;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-        .card a {
+        h1 { margin-bottom: 5px; }
+        .subtitle { color: #666; margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 10px; border-bottom: 2px solid #ddd; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        a { color: #0066cc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .tag {
             display: inline-block;
-            background: #667eea;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 13px;
-            transition: background 0.2s;
-        }
-        .card a:hover {
-            background: #5a6fd6;
-        }
-        .card.react a { background: #61dafb; color: #000; }
-        .card.react:hover { border-color: #61dafb; }
-        .card.vue a { background: #42b883; }
-        .card.vue:hover { border-color: #42b883; }
-        .card.angular a { background: #dd0031; }
-        .card.angular:hover { border-color: #dd0031; }
-        .card.editors a { background: #6c5ce7; }
-        .card.editors:hover { border-color: #6c5ce7; }
-        .badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 10px;
+            background: #eee;
+            padding: 2px 6px;
+            border-radius: 3px;
             font-size: 11px;
-            margin-left: 8px;
-            vertical-align: middle;
-        }
-        .badge.html { background: #e9ecef; color: #495057; }
-        .badge.react { background: #e3f6fc; color: #0077b5; }
-        .badge.vue { background: #e8f5ef; color: #2e7d32; }
-        .badge.angular { background: #fce4ec; color: #c62828; }
-        .badge.editors { background: #ede7f6; color: #5e35b1; }
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            color: #999;
-            font-size: 14px;
-        }
-        .footer a {
-            color: #667eea;
+            color: #666;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🤖 100xBot Test Pages</h1>
-        <p class="subtitle">Comprehensive testing resources for DOM manipulation capabilities</p>
+    <h1>100xBot Test Pages</h1>
+    <p class="subtitle">DOM manipulation test pages for browser extension development</p>
 
-        <h2>📋 Basic DOM Testing</h2>
-        <div class="card-grid">
-            <div class="card">
-                <h3>🧪 DOM Capabilities <span class="badge html">HTML</span></h3>
-                <p>All HTML form elements, contenteditable, ARIA components, Shadow DOM, iframes, and edge cases.</p>
-                <a href="dom-test.html">Open Test Page →</a>
-            </div>
-        </div>
+    <table>
+        <tr>
+            <th>Page</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><a href="dom-test.html">DOM Capabilities</a> <span class="tag">HTML</span></td>
+            <td>All HTML inputs, contenteditable, ARIA, Shadow DOM, iframes, edge cases</td>
+        </tr>
+        <tr>
+            <td><a href="react-test.html">React</a> <span class="tag">React 18</span></td>
+            <td>Controlled inputs, validation, debounce, autocomplete, tag input, forms</td>
+        </tr>
+        <tr>
+            <td><a href="vue-test.html">Vue</a> <span class="tag">Vue 3</span></td>
+            <td>v-model, modifiers, computed properties, reactive forms</td>
+        </tr>
+        <tr>
+            <td><a href="angular-test.html">Angular</a> <span class="tag">Angular 17</span></td>
+            <td>ngModel, FormControl, FormGroup, validation</td>
+        </tr>
+        <tr>
+            <td><a href="editors-test.html">Text Editors</a> <span class="tag">8 editors</span></td>
+            <td>Monaco, CodeMirror, ACE, Quill, TinyMCE, Slate, ProseMirror, Markdown</td>
+        </tr>
+    </table>
 
-        <h2>⚛️ Framework Components</h2>
-        <div class="card-grid">
-            <div class="card react">
-                <h3>⚛️ React Components <span class="badge react">React 18</span></h3>
-                <p>Controlled inputs, validation, debouncing, autocomplete, tag input, forms with useState/useRef.</p>
-                <a href="react-test.html">Open React Page →</a>
-            </div>
-            <div class="card vue">
-                <h3>💚 Vue Components <span class="badge vue">Vue 3</span></h3>
-                <p>v-model bindings, modifiers (.trim, .lazy, .number), computed properties, reactive forms.</p>
-                <a href="vue-test.html">Open Vue Page →</a>
-            </div>
-            <div class="card angular">
-                <h3>🅰️ Angular Components <span class="badge angular">Angular 17</span></h3>
-                <p>Template-driven forms (ngModel), reactive forms (FormControl, FormGroup), validation.</p>
-                <a href="angular-test.html">Open Angular Page →</a>
-            </div>
-        </div>
-
-        <h2>📝 Text Editors</h2>
-        <div class="card-grid">
-            <div class="card editors">
-                <h3>📝 Code & Rich Text Editors <span class="badge editors">8 Editors</span></h3>
-                <p>Monaco (VS Code), CodeMirror, ACE, Quill, TinyMCE-style, Slate/Draft.js, ProseMirror, Markdown.</p>
-                <a href="editors-test.html">Open Editors Page →</a>
-            </div>
-        </div>
-
-        <div class="footer">
-            <p>Part of the <a href="https://github.com/100x-bot/100xbot" target="_blank">100xBot</a> project</p>
-            <p style="font-size: 12px; margin-top: 10px;">
-                All test pages include event logging for debugging DOM interactions.
-            </p>
-        </div>
-    </div>
+    <p style="margin-top: 30px; font-size: 13px; color: #999;">
+        <a href="https://github.com/100x-bot/100xbot">GitHub</a> &middot; All pages include event logging
+    </p>
 </body>
 </html>
